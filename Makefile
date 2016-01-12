@@ -7,13 +7,13 @@ AVRNM ?= avr-nm
 AVROBJCOPY ?= avr-objcopy
 AVROBJDUMP ?= avr-objdump
 
-CFLAGS += -mmcu=attiny88 -DF_CPU=1000000UL
+CFLAGS += -mmcu=attiny88 -DF_CPU=8000000UL
 # CFLAGS += -gdwarf-2
 CFLAGS += -I. -std=gnu99 -Os -Wall -Wextra -pedantic
 CFLAGS += -funsigned-char -funsigned-bitfields -fpack-struct -fshort-enums
 CFLAGS += -fwhole-program -flto -mstrict-X
 
-#AVRFLAGS += -U lfuse:w:0xe4:m -U hfuse:w:0xdf:m -U efuse:w:0xff:m
+AVRFLAGS += -U lfuse:w:0xee:m -U hfuse:w:0xdf:m -U efuse:w:0xff:m
 AVRFLAGS += -U flash:w:main.hex
 #AVRFLAGS += -U eeprom:w:main.eep
 
