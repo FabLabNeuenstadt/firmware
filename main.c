@@ -1,6 +1,5 @@
 #include <avr/io.h>
 #include <avr/interrupt.h>
-#include <avr/power.h>
 #include <avr/wdt.h>
 #include <util/delay.h>
 #include <stdlib.h>
@@ -14,7 +13,7 @@ int main (void)
 	uint16_t want_shutdown = 0;
 
 	// disable ADC to save power
-	power_adc_disable();
+	PRR |= _BV(PRADC);
 
 	// dito
 	wdt_disable();
