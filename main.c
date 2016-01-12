@@ -1,15 +1,18 @@
 #include <avr/io.h>
 #include <avr/interrupt.h>
 #include <avr/power.h>
-#include <avr/sleep.h>
 #include <avr/wdt.h>
 #include <util/delay.h>
 #include <stdlib.h>
+
+#define SHUTDOWN_THRESHOLD 2048
 
 volatile uint8_t disp[32];
 
 int main (void)
 {
+	uint16_t want_shutdown = 0;
+
 	// disable ADC to save power
 	power_adc_disable();
 
@@ -19,9 +22,11 @@ int main (void)
 	// Ports B and D drive the dot matrix display -> set all as output
 	DDRB = 0xff;
 	DDRD = 0xff;
-
 	PORTB = 0;
 	PORTD = 0;
+
+	// Enable pull-ups on PC3 and PC7 (button pins)
+	PORTC |= _BV(PC3) | _BV(PC7);
 
 	// Enable 8bit counter with prescaler=8 (-> timer frequency = 1MHz)
 	TCCR0A = _BV(CS01);
@@ -65,9 +70,48 @@ int main (void)
 	sei();
 
 	while (1) {
-		// nothing to do here, go to sleep to save power
-		sleep_enable();
-		sleep_cpu();
+		// nothing to do here, go to idle to save power
+		SMCR = _BV(SE);
+		asm("sleep");
+
+		// both buttons are pressed
+		if ((PINC & (_BV(PC3) | _BV(PC7))) == 0) {
+			// naptime!
+			// But not before both buttons have been pressed for
+			// SHUTDOWN_THRESHOLD * 0.256 ms. And then, not before both have
+			// been released, because otherwise we'd go te sleep when
+			// they're pressed and wake up when they're released, which
+			// isn't really the point here.
+
+			if (want_shutdown < SHUTDOWN_THRESHOLD) {
+				want_shutdown++;
+			}
+			// TODO turn off display when want_shutdown >= SHUTDOWN_THRESHOLD
+			// to indicate we're about to shut down
+		} // both buttons released
+		else if ((PINC & _BV(PC3)) && (PINC & _BV(PC7))) {
+			if (want_shutdown >= SHUTDOWN_THRESHOLD) {
+				// actual naptime
+
+				// turn off display
+				PORTB = 0;
+				PORTD = 0;
+
+				// enable PCINT on PC3 (PCINT11) and PC7 (PCINT15) for wakeup
+				PCMSK1 |= _BV(PCINT15) | _BV(PCINT11);
+				PCICR |= _BV(PCIE1);
+
+				// go to power-down mode
+				SMCR = _BV(SM1) | _BV(SE);
+				asm("sleep");
+
+				// execution will resume here - disable PCINT again.
+				// Don't disable PCICR, something else might need it.
+				PCMSK1 &= ~(_BV(PCINT15) | _BV(PCINT11));
+				PCICR &= ~_BV(PCIE1);
+			}
+			want_shutdown = 0;
+		}
 	}
 
 	return 0;
@@ -108,4 +152,9 @@ ISR(TIMER0_OVF_vect)
 
 	if (++active_col == 8)
 		active_col = 0;
+}
+
+ISR(PCINT1_vect)
+{
+	// we use PCINT1 for wakeup, so we should catch it here (and do nothing)
 }
