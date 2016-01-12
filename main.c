@@ -1,24 +1,32 @@
 #include <avr/io.h>
 #include <avr/interrupt.h>
+#include <avr/power.h>
 #include <avr/sleep.h>
 #include <avr/wdt.h>
 #include <util/delay.h>
 #include <stdlib.h>
 
-volatile uint8_t disp[16];
+volatile uint8_t disp[32];
 
 int main (void)
 {
+	// disable ADC to save power
+	power_adc_disable();
+
+	// dito
 	wdt_disable();
 
+	// Ports B and D drive the dot matrix display -> set all as output
 	DDRB = 0xff;
 	DDRD = 0xff;
 
 	PORTB = 0;
 	PORTD = 0;
 
-	TCCR0A = _BV(CS00); // no prescaler (/8 without software prescaler is okay too)
-	TIMSK0 = _BV(TOIE0); // interrupt on overflow
+	// Enable 8bit counter with prescaler=8 (-> timer frequency = 1MHz)
+	TCCR0A = _BV(CS01);
+	// raise timer interrupt on counter overflow (-> interrupt frequency = ~4kHz)
+	TIMSK0 = _BV(TOIE0);
 
 	// smile!
 	disp[0] = 0x08;
@@ -29,24 +37,50 @@ int main (void)
 	disp[5] = 0x62;
 	disp[6] = 0x04;
 	disp[7] = 0x08;
-	disp[8] = 0x28;
-	disp[9] = 0x44;
-	disp[10] = 0x22;
-	disp[11] = 0x02;
-	disp[12] = 0x02;
-	disp[13] = 0x22;
-	disp[14] = 0x44;
-	disp[15] = 0x28;
+	disp[8] = 0x00;
+	disp[9] = 0x00;
+	disp[10] = 0x00;
+	disp[11] = 0x00;
+	disp[12] = 0x00;
+	disp[13] = 0x00;
+	disp[14] = 0x00;
+	disp[15] = 0x00;
+	disp[16] = 0x28;
+	disp[17] = 0x44;
+	disp[18] = 0x22;
+	disp[19] = 0x02;
+	disp[20] = 0x02;
+	disp[21] = 0x22;
+	disp[22] = 0x44;
+	disp[23] = 0x28;
+	disp[24] = 0x00;
+	disp[25] = 0x00;
+	disp[26] = 0x00;
+	disp[27] = 0x00;
+	disp[28] = 0x00;
+	disp[29] = 0x00;
+	disp[30] = 0x00;
+	disp[31] = 0x00;
 
 	sei();
 
 	while (1) {
+		// nothing to do here, go to sleep to save power
 		sleep_enable();
+		sleep_cpu();
 	}
 
 	return 0;
 }
 
+/*
+ * Draws a single display column. This function should be called at least once
+ * per millisecond.
+ *
+ * Current configuration:
+ * Called every 256 microseconds. The whole display is refreshed every 2048us,
+ * giving a refresh rate of ~500Hz
+ */
 ISR(TIMER0_OVF_vect)
 {
 	static uint8_t active_col = 0;
@@ -55,7 +89,7 @@ ISR(TIMER0_OVF_vect)
 
 	uint8_t buffer_col;
 
-	if (++scroll == 1024) {
+	if (++scroll == 256) {
 		scroll = 0;
 		if (++disp_offset == sizeof(disp)) {
 			disp_offset = 0;
