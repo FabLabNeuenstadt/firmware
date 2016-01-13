@@ -4,6 +4,8 @@
 #include <util/delay.h>
 #include <stdlib.h>
 
+#include "font.h"
+
 #define SHUTDOWN_THRESHOLD 2048
 
 volatile uint8_t disp[32];
@@ -32,6 +34,8 @@ int main (void)
 	// raise timer interrupt on counter overflow (-> interrupt frequency = ~4kHz)
 	TIMSK0 = _BV(TOIE0);
 
+	//disp = font[2];
+#if 1
 	// smile!
 	disp[0] = 0x08;
 	disp[1] = 0x04;
@@ -65,6 +69,7 @@ int main (void)
 	disp[29] = 0x00;
 	disp[30] = 0x00;
 	disp[31] = 0x00;
+#endif
 
 	sei();
 
@@ -130,23 +135,27 @@ ISR(TIMER0_OVF_vect)
 	static uint16_t scroll = 0;
 	static uint8_t disp_offset = 0;
 
-	uint8_t buffer_col;
+	static uint8_t display[8];
+
+	uint8_t i;
 
 	if (++scroll == 256) {
 		scroll = 0;
 		if (++disp_offset == sizeof(disp)) {
 			disp_offset = 0;
 		}
-	}
 
-	buffer_col = (disp_offset + active_col) % sizeof(disp);
+		for (i = 0; i < 8; i++) {
+			display[i] = ~disp[(disp_offset + i) % sizeof(disp)];
+		}
+	}
 
 	/*
 	 * To avoid flickering, do not put any code (or expensive index
 	 * calculations) between the following three lines.
 	 */
 	PORTB = 0;
-	PORTD = ~disp[buffer_col];
+	PORTD = display[active_col];
 	PORTB = _BV(active_col);
 
 	if (++active_col == 8)
