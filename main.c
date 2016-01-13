@@ -8,7 +8,7 @@
 
 #define SHUTDOWN_THRESHOLD 2048
 
-volatile uint8_t disp[32];
+volatile uint8_t disp[8];
 
 int main (void)
 {
@@ -34,8 +34,16 @@ int main (void)
 	// raise timer interrupt on counter overflow (-> interrupt frequency = ~4kHz)
 	TIMSK0 = _BV(TOIE0);
 
-	//disp = font[2];
-#if 1
+	disp[0] = font[0][1];
+	disp[1] = font[0][2];
+	disp[2] = font[0][3];
+	disp[3] = font[0][4];
+	disp[4] = font[0][5];
+	disp[5] = font[0][6];
+	disp[6] = font[0][7];
+	disp[7] = font[0][8];
+
+#if 0
 	// smile!
 	disp[0] = 0x08;
 	disp[1] = 0x04;
@@ -139,7 +147,7 @@ ISR(TIMER0_OVF_vect)
 
 	uint8_t i;
 
-	if (++scroll == 256) {
+	if (++scroll == 512) {
 		scroll = 0;
 		if (++disp_offset == sizeof(disp)) {
 			disp_offset = 0;
