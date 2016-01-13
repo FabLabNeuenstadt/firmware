@@ -4,9 +4,11 @@
 #include <util/delay.h>
 #include <stdlib.h>
 
+#include "font.h"
+
 #define SHUTDOWN_THRESHOLD 2048
 
-volatile uint8_t disp[32];
+volatile uint8_t disp[8];
 
 int main (void)
 {
@@ -32,6 +34,16 @@ int main (void)
 	// raise timer interrupt on counter overflow (-> interrupt frequency = ~4kHz)
 	TIMSK0 = _BV(TOIE0);
 
+	disp[0] = font[0][1];
+	disp[1] = font[0][2];
+	disp[2] = font[0][3];
+	disp[3] = font[0][4];
+	disp[4] = font[0][5];
+	disp[5] = font[0][6];
+	disp[6] = font[0][7];
+	disp[7] = font[0][8];
+
+#if 0
 	// smile!
 	disp[0] = 0x08;
 	disp[1] = 0x04;
@@ -57,14 +69,15 @@ int main (void)
 	disp[21] = 0x22;
 	disp[22] = 0x44;
 	disp[23] = 0x28;
-	disp[24] = 0xFF;
-	disp[25] = 0xFF;
-	disp[26] = 0xFF;
-	disp[27] = 0xFF;
-	disp[28] = 0xFF;
-	disp[29] = 0xFF;
-	disp[30] = 0xFF;
-	disp[31] = 0xFF;
+	disp[24] = 0x00;
+	disp[25] = 0x00;
+	disp[26] = 0x00;
+	disp[27] = 0x00;
+	disp[28] = 0x00;
+	disp[29] = 0x00;
+	disp[30] = 0x00;
+	disp[31] = 0x00;
+#endif
 
 	sei();
 
@@ -130,23 +143,27 @@ ISR(TIMER0_OVF_vect)
 	static uint16_t scroll = 0;
 	static uint8_t disp_offset = 0;
 
-	uint8_t buffer_col;
+	static uint8_t display[8];
 
-	if (++scroll == 256) {
+	uint8_t i;
+
+	if (++scroll == 512) {
 		scroll = 0;
 		if (++disp_offset == sizeof(disp)) {
 			disp_offset = 0;
 		}
-	}
 
-	buffer_col = (disp_offset + active_col) % sizeof(disp);
+		for (i = 0; i < 8; i++) {
+			display[i] = ~disp[(disp_offset + i) % sizeof(disp)];
+		}
+	}
 
 	/*
 	 * To avoid flickering, do not put any code (or expensive index
 	 * calculations) between the following three lines.
 	 */
 	PORTB = 0;
-	PORTD = ~disp[buffer_col];
+	PORTD = display[active_col];
 	PORTB = _BV(active_col);
 
 	if (++active_col == 8)
