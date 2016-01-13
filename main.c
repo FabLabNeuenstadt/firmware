@@ -57,14 +57,14 @@ int main (void)
 	disp[21] = 0x22;
 	disp[22] = 0x44;
 	disp[23] = 0x28;
-	disp[24] = 0x00;
-	disp[25] = 0x00;
-	disp[26] = 0x00;
-	disp[27] = 0x00;
-	disp[28] = 0x00;
-	disp[29] = 0x00;
-	disp[30] = 0x00;
-	disp[31] = 0x00;
+	disp[24] = 0xFF;
+	disp[25] = 0xFF;
+	disp[26] = 0xFF;
+	disp[27] = 0xFF;
+	disp[28] = 0xFF;
+	disp[29] = 0xFF;
+	disp[30] = 0xFF;
+	disp[31] = 0xFF;
 
 	sei();
 
