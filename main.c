@@ -4,7 +4,7 @@
 #include <util/delay.h>
 #include <stdlib.h>
 
-#include "font.h"
+#include "font2.h"
 
 #define SHUTDOWN_THRESHOLD 2048
 
