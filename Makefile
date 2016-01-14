@@ -1,7 +1,7 @@
 MCU ?= attiny88
 AVRDUDE_PROGRAMMER ?= usbasp
 
-AVRCC ?= avr-gcc
+AVRCC ?= avr-g++
 AVRFLASH ?= avrdude
 AVRNM ?= avr-nm
 AVROBJCOPY ?= avr-objcopy
@@ -9,9 +9,9 @@ AVROBJDUMP ?= avr-objdump
 
 CFLAGS += -mmcu=attiny88 -DF_CPU=8000000UL
 # CFLAGS += -gdwarf-2
-CFLAGS += -I. -std=gnu99 -Os -Wall -Wextra -pedantic
+CFLAGS += -std=c++11 -I. -Os -Wall -Wextra -pedantic
 CFLAGS += -funsigned-char -funsigned-bitfields -fpack-struct -fshort-enums
-CFLAGS += -fwhole-program -flto -mstrict-X
+CFLAGS += -fwhole-program -flto -fno-rtti -fno-exceptions -mstrict-X
 
 AVRFLAGS += -U lfuse:w:0xee:m -U hfuse:w:0xdf:m -U efuse:w:0xff:m
 AVRFLAGS += -U flash:w:main.hex
@@ -24,8 +24,8 @@ AVRFLAGS += -U flash:w:main.hex
 	${AVROBJCOPY} -j .eeprom --set-section-flags=.eeprom="alloc,load" \
 	--change-section-lma .eeprom=0 -O ihex $< $@
 
-main.elf: main.c
-	${AVRCC} ${CFLAGS} -o $@ ${@:.elf=.c} -Wl,-Map=main.map,--cref
+main.elf: main.cc
+	${AVRCC} ${CFLAGS} -o $@ ${@:.elf=.cc} -Wl,-Map=main.map,--cref
 	@echo
 	@avr-size --format=avr --mcu=${MCU} $@
 
