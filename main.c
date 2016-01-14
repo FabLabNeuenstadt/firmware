@@ -34,14 +34,14 @@ int main (void)
 	// raise timer interrupt on counter overflow (-> interrupt frequency = ~4kHz)
 	TIMSK0 = _BV(TOIE0);
 
-	disp[0] = font[0][1];
-	disp[1] = font[0][2];
-	disp[2] = font[0][3];
-	disp[3] = font[0][4];
-	disp[4] = font[0][5];
-	disp[5] = font[0][6];
-	disp[6] = font[0][7];
-	disp[7] = font[0][8];
+	disp[0] = font[8][1];
+	disp[1] = font[8][2];
+	disp[2] = font[8][3];
+	disp[3] = font[8][4];
+	disp[4] = font[8][5];
+	disp[5] = font[8][6];
+	disp[6] = font[8][7];
+	disp[7] = font[8][8];
 
 #if 0
 	// smile!
@@ -98,16 +98,20 @@ int main (void)
 			if (want_shutdown < SHUTDOWN_THRESHOLD) {
 				want_shutdown++;
 			}
-			// TODO turn off display when want_shutdown >= SHUTDOWN_THRESHOLD
-			// to indicate we're about to shut down
-		} // both buttons released
-		else if ((PINC & _BV(PC3)) && (PINC & _BV(PC7))) {
-			if (want_shutdown >= SHUTDOWN_THRESHOLD) {
-				// actual naptime
+			else {
 
-				// turn off display
+				// turn off display to indicate we're about to shut down
+				TIMSK0 &= ~_BV(TOIE0);
 				PORTB = 0;
 				PORTD = 0;
+
+				// wait until both buttons are released
+				while (!((PINC & _BV(PC3)) && (PINC & _BV(PC7)))) ;
+
+				// and some more to debounce the buttons
+				_delay_ms(10);
+
+				// actual naptime
 
 				// enable PCINT on PC3 (PCINT11) and PC7 (PCINT15) for wakeup
 				PCMSK1 |= _BV(PCINT15) | _BV(PCINT11);
@@ -120,8 +124,14 @@ int main (void)
 				// execution will resume here - disable PCINT again.
 				// Don't disable PCICR, something else might need it.
 				PCMSK1 &= ~(_BV(PCINT15) | _BV(PCINT11));
-				PCICR &= ~_BV(PCIE1);
+
+				// turn on display
+				TIMSK0 |= _BV(TOIE0);
+
+				want_shutdown = 0;
 			}
+		}
+		else {
 			want_shutdown = 0;
 		}
 	}
