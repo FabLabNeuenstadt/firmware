@@ -26,7 +26,7 @@ class Display {
 		void turn_off(void);
 };
 
-System system;
+System rocket;
 Display display;
 
 void Display::turn_off()
@@ -164,7 +164,7 @@ int main (void)
 		// nothing to do here, go to idle to save power
 		SMCR = _BV(SE);
 		asm("sleep");
-		system.loop();
+		rocket.loop();
 	}
 
 	return 0;
