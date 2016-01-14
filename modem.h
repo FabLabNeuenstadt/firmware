@@ -14,9 +14,9 @@
 
 /* Modem defines */
 #define MODEM_SYNC_LEN		42
-#define MODEM_TIMER		TCNT1
-#define MODEM_PIN 		PCINT3
-#define MODEM_DDR		DDRB
+#define MODEM_TIMER		TCNT1L
+#define MODEM_PIN 		PCINT24
+#define MODEM_DDR		DDRA
 
 /* Public funtions */
 uint8_t modem_buffer_available();

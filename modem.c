@@ -43,7 +43,7 @@ uint8_t modem_buffer_get() {
 /*
  * Pin Change Interrupt Vector. This is The Modem.
  */
-ISR(PCINT0_vect) {
+ISR(PCINT3_vect) {
 	/* Static variables instead of globals to keep scope inside ISR */
 	static uint8_t modem_bit = 0;
 	static uint8_t modem_bitlen = 0;
@@ -84,11 +84,11 @@ void modem_init()  {
 	MODEM_DDR &= ~(1 << MODEM_PIN);
 
 	/* Enable Pin Change Interrupts and PCINT for MODEM_PIN */
-	GIMSK |= (1 << PCIE);
-	PCMSK |= (1 << MODEM_PIN);
+	PCMSK1 |= _BV(MODEM_PIN);
+	PCICR |= _BV(PCIE3);
 
-	/* Timer: TCCR1: CS10, CS11 and CS12 bits: 8MHz clock with Prescaler 64 = 125kHz timer clock */
-	TCCR1 = (1 << CS10) | (1 << CS11) | (1 << CS12);
+	/* Timer: TCCR1: CS10 and CS11 bits: 8MHz clock with Prescaler 64 = 125kHz timer clock */
+	TCCR1B = _BV(CS11) | _BV(CS10);
 
 	/* Enable interrupts */
 	sei();
