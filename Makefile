@@ -1,21 +1,36 @@
 MCU ?= attiny88
 AVRDUDE_PROGRAMMER ?= usbasp
 
-AVRCC ?= avr-g++
+AVRCC ?= avr-gcc
+AVRCXX ?= avr-g++
 AVRFLASH ?= avrdude
 AVRNM ?= avr-nm
 AVROBJCOPY ?= avr-objcopy
 AVROBJDUMP ?= avr-objdump
 
-CFLAGS += -mmcu=attiny88 -DF_CPU=8000000UL
-# CFLAGS += -gdwarf-2
-CFLAGS += -std=c++11 -I. -Os -Wall -Wextra -pedantic
-CFLAGS += -funsigned-char -funsigned-bitfields -fpack-struct -fshort-enums
-CFLAGS += -fwhole-program -flto -fno-rtti -fno-exceptions -mstrict-X
+MCU_FLAGS = -mmcu=attiny88 -DF_CPU=8000000UL
+
+SHARED_FLAGS = ${MCU_FLAGS} -I. -Os -Wall -Wextra -pedantic
+SHARED_FLAGS += -funsigned-char -funsigned-bitfields -fpack-struct -fshort-enums
+SHARED_FLAGS += -fwhole-program -flto -mstrict-X
+
+CFLAGS += ${SHARED_FLAGS} -std=c11
+CXXFLAGS += ${SHARED_FLAGS} -std=c++11 -fno-rtti -fno-exceptions
+
+ASFLAGS += ${MCU_FLAGS} -wA,--warn
+LDFLAGS += -Wl,--gc-sections
 
 AVRFLAGS += -U lfuse:w:0xee:m -U hfuse:w:0xdf:m -U efuse:w:0xff:m
 AVRFLAGS += -U flash:w:main.hex
 #AVRFLAGS += -U eeprom:w:main.eep
+
+HEADERS  = $(wildcard *.h)
+ASFILES  = $(wildcard *.S)
+CFILES   = $(wildcard *.c)
+CXXFILES = $(wildcard *.cc)
+OBJECTS  = ${CFILES:.c=.o} ${CXXFILES:.cc=.o} ${ASFILES:.S=.o}
+
+all: main.elf
 
 %.hex: %.elf
 	${AVROBJCOPY} -O ihex -R .eeprom $< $@
@@ -24,8 +39,14 @@ AVRFLAGS += -U flash:w:main.hex
 	${AVROBJCOPY} -j .eeprom --set-section-flags=.eeprom="alloc,load" \
 	--change-section-lma .eeprom=0 -O ihex $< $@
 
-main.elf: main.cc
-	${AVRCC} ${CFLAGS} -o $@ ${@:.elf=.cc} -Wl,-Map=main.map,--cref
+%.o: %.cc ${HEADERS}
+	${AVRCXX} ${CXXFLAGS} -o $@ $< -c -Wl,-Map=main.map,--cref
+
+%.o: %.c ${HEADERS}
+	${AVRCC} ${CFLAGS} -o $@ $< -c -Wl,-Map=main.map,--cref
+
+main.elf: ${OBJECTS}
+	${AVRCXX} ${CXXFLAGS} -o $@ $^ ${LDFLAGS}
 	@echo
 	@avr-size --format=avr --mcu=${MCU} $@
 
@@ -38,9 +59,4 @@ secsize: main.elf
 funsize: main.elf
 	${AVRNM} --print-size --size-sort main.elf
 
-.PHONY: program secsize funsize
-
-# Listing of phony targets.
-.PHONY : all begin finish end sizebefore sizeafter gccversion \
-build elf hex eep lss sym coff extcoff \
-clean clean_list program debug gdb-config
+.PHONY: all program secsize funsize
