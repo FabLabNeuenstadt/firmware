@@ -7,6 +7,8 @@
  * License: LGPLv3, see COPYING, and COPYING.LESSER -files for more info
  */
 
+#include <avr/io.h>
+#include <stdlib.h>
 #include "modem.h"
 
 /* Ring buffer global variables */
@@ -83,12 +85,12 @@ ISR(PCINT3_vect) {
  */
 void Modem::init()  {
 	/* Modem pin as input */
-	MODEM_DDR &= ~(1 << MODEM_PIN);
+	MODEM_DDR &= ~_BV(MODEM_PIN);
 
 	/* Enable Pin Change Interrupts and PCINT for MODEM_PIN */
-	PCMSK1 |= _BV(MODEM_PIN);
-	PCICR |= _BV(PCIE3);
+	MODEM_PCMSK |= _BV(MODEM_PCINT);
+	PCICR |= _BV(MODEM_PCIE);
 
 	/* Timer: TCCR1: CS10 and CS11 bits: 8MHz clock with Prescaler 64 = 125kHz timer clock */
 	TCCR1B = _BV(CS11) | _BV(CS10);
-} 
+}

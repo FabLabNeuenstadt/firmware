@@ -33,14 +33,8 @@ int main (void)
 	// raise timer interrupt on counter overflow (-> interrupt frequency = ~4kHz)
 	TIMSK0 = _BV(TOIE0);
 
-	disp[0] = font[8][1];
-	disp[1] = font[8][2];
-	disp[2] = font[8][3];
-	disp[3] = font[8][4];
-	disp[4] = font[8][5];
-	disp[5] = font[8][6];
-	disp[6] = font[8][7];
-	disp[7] = font[8][8];
+	disp[0] = 0xff;
+	disp[1] = 0xaa;
 
 #if 0
 	// smile!
