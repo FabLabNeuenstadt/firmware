@@ -4,7 +4,8 @@
  * License: LGPLv3, see COPYING, and COPYING.LESSER -files for more info
  */
 
-#pragma once
+#ifndef MODEM_H_
+#define MODEM_H_
 
 #include <avr/interrupt.h>
 #include <stdlib.h>
@@ -18,7 +19,14 @@
 #define MODEM_PIN 		PCINT24
 #define MODEM_DDR		DDRA
 
-/* Public funtions */
-uint8_t modem_buffer_available();
-uint8_t modem_buffer_get();
-void modem_init();
+class Modem {
+	public:
+		Modem() {};
+		uint8_t buffer_available(void);
+		uint8_t buffer_get(void);
+		void init(void);
+};
+
+extern Modem modem;
+
+#endif /* MODEM_H_ */

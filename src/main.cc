@@ -5,6 +5,7 @@
 #include <stdlib.h>
 
 #include "font2.h"
+#include "modem.h"
 
 #define SHUTDOWN_THRESHOLD 2048
 
@@ -89,6 +90,10 @@ void System::loop()
 	else {
 		want_shutdown = 0;
 	}
+
+	if (modem.buffer_available()) {
+		disp[0] = modem.buffer_get();
+	}
 }
 
 int main (void)
@@ -157,6 +162,8 @@ int main (void)
 	disp[30] = 0x00;
 	disp[31] = 0x00;
 #endif
+
+	modem.init();
 
 	sei();
 
