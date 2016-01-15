@@ -33,8 +33,14 @@ int main (void)
 	// raise timer interrupt on counter overflow (-> interrupt frequency = ~4kHz)
 	TIMSK0 = _BV(TOIE0);
 
-	disp[0] = 0xff;
-	disp[1] = 0xaa;
+	disp[0] = 0x01;
+	disp[1] = 0x02;
+	disp[2] = 0x04;
+	disp[3] = 0x08;
+	disp[4] = 0x10;
+	disp[5] = 0x20;
+	disp[6] = 0x40;
+	disp[7] = 0x80;
 
 #if 0
 	// smile!
@@ -72,7 +78,7 @@ int main (void)
 	disp[31] = 0x00;
 #endif
 
-	modem.init();
+	modem.enable();
 
 	sei();
 

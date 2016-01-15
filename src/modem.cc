@@ -28,7 +28,7 @@ uint8_t Modem::buffer_available() {
  * Store 1 byte in ringbuffer
  */
 static inline void modem_buffer_put(const uint8_t c) {
-	if (modem.buffer_available() != MODEM_BUFFER_SIZE) { 
+	if (modem.buffer_available() != MODEM_BUFFER_SIZE) {
 		modem_buffer[modem_buffer_head++ % MODEM_BUFFER_SIZE] = c;
 	} 
 }
@@ -83,7 +83,11 @@ ISR(PCINT3_vect) {
 /*
  * Start the modem by enabling Pin Change Interrupts & Timer
  */
-void Modem::init()  {
+void Modem::enable()  {
+	/* Enable R1 */
+	DDRA  |= _BV(PA3);
+	PORTA |= _BV(PA3);
+
 	/* Modem pin as input */
 	MODEM_DDR &= ~_BV(MODEM_PIN);
 
@@ -93,4 +97,10 @@ void Modem::init()  {
 
 	/* Timer: TCCR1: CS10 and CS11 bits: 8MHz clock with Prescaler 64 = 125kHz timer clock */
 	TCCR1B = _BV(CS11) | _BV(CS10);
+}
+
+void Modem::disable()
+{
+	PORTA &= ~_BV(PA3);
+	DDRA  &= ~_BV(PA3);
 }

@@ -27,7 +27,8 @@ class Modem {
 		Modem() {};
 		uint8_t buffer_available(void);
 		uint8_t buffer_get(void);
-		void init(void);
+		void enable(void);
+		void disable(void);
 };
 
 extern Modem modem;

@@ -34,6 +34,8 @@ void System::loop()
 			// turn off display to indicate we're about to shut down
 			display.turn_off();
 
+			modem.disable();
+
 			// wait until both buttons are released
 			while (!((PINC & _BV(PC3)) && (PINC & _BV(PC7)))) ;
 
@@ -57,6 +59,9 @@ void System::loop()
 			// turn on display
 			display.turn_on();
 
+			// ... and modem
+			modem.enable();
+
 			want_shutdown = 0;
 		}
 	}
@@ -64,9 +69,9 @@ void System::loop()
 		want_shutdown = 0;
 	}
 
-	if (modem.buffer_available()) {
+	while (modem.buffer_available()) {
 		disp[i++] = modem.buffer_get();
-		if (i == 7)
+		if (i == 8)
 			i = 0;
 	}
 }
