@@ -21,42 +21,45 @@ ASFLAGS += ${MCU_FLAGS} -wA,--warn
 LDFLAGS += -Wl,--gc-sections
 
 AVRFLAGS += -U lfuse:w:0xee:m -U hfuse:w:0xdf:m -U efuse:w:0xff:m
-AVRFLAGS += -U flash:w:main.hex
+AVRFLAGS += -U flash:w:build/main.hex
 #AVRFLAGS += -U eeprom:w:main.eep
 
-HEADERS  = $(wildcard *.h)
-ASFILES  = $(wildcard *.S)
-CFILES   = $(wildcard *.c)
-CXXFILES = $(wildcard *.cc)
-OBJECTS  = ${CFILES:.c=.o} ${CXXFILES:.cc=.o} ${ASFILES:.S=.o}
+HEADERS  = $(wildcard src/*.h)
+ASFILES  = $(wildcard src/*.S)
+CFILES   = $(wildcard src/*.c)
+CXXFILES = $(wildcard src/*.cc)
+OBJECTS  = ${CFILES:src/%.c=build/%.o} ${CXXFILES:src/%.cc=build/%.o} ${ASFILES:src/%.S=build/%.o}
 
-all: main.elf
+all: build build/main.elf
 
-%.hex: %.elf
+build:
+	mkdir -p build
+
+build/%.hex: build/%.elf
 	${AVROBJCOPY} -O ihex -R .eeprom $< $@
 
-%.eep: %.elf
+build/%.eep: build/%.elf
 	${AVROBJCOPY} -j .eeprom --set-section-flags=.eeprom="alloc,load" \
 	--change-section-lma .eeprom=0 -O ihex $< $@
 
-%.o: %.cc ${HEADERS}
+build/%.o: src/%.cc ${HEADERS}
 	${AVRCXX} ${CXXFLAGS} -o $@ $< -c -Wl,-Map=main.map,--cref
 
-%.o: %.c ${HEADERS}
+build/%.o: src/%.c ${HEADERS}
 	${AVRCC} ${CFLAGS} -o $@ $< -c -Wl,-Map=main.map,--cref
 
-main.elf: ${OBJECTS}
+build/main.elf: ${OBJECTS}
 	${AVRCXX} ${CXXFLAGS} -o $@ $^ ${LDFLAGS}
 	@echo
 	@avr-size --format=avr --mcu=${MCU} $@
 
-program: main.hex #main.eep
+program: build/main.hex #main.eep
 	${AVRFLASH} -p ${MCU} -c ${AVRDUDE_PROGRAMMER} ${AVRFLAGS}
 
-secsize: main.elf
+secsize: build/main.elf
 	${AVROBJDUMP} -hw -j.text -j.bss -j.data main.elf
 
-funsize: main.elf
+funsize: build/main.elf
 	${AVRNM} --print-size --size-sort main.elf
 
 .PHONY: all program secsize funsize
