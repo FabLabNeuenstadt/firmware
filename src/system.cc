@@ -16,6 +16,7 @@ extern volatile uint8_t disp[8];
 
 void System::loop()
 {
+	static uint8_t i = 0;
 	// both buttons are pressed
 	if ((PINC & (_BV(PC3) | _BV(PC7))) == 0) {
 		// naptime!
@@ -64,7 +65,9 @@ void System::loop()
 	}
 
 	if (modem.buffer_available()) {
-		disp[0] = modem.buffer_get();
+		disp[i++] = modem.buffer_get();
+		if (i == 7)
+			i = 0;
 	}
 }
 
