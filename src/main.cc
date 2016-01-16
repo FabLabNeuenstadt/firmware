@@ -19,19 +19,8 @@ int main (void)
 	// dito
 	wdt_disable();
 
-	// Ports B and D drive the dot matrix display -> set all as output
-	DDRB = 0xff;
-	DDRD = 0xff;
-	PORTB = 0;
-	PORTD = 0;
-
 	// Enable pull-ups on PC3 and PC7 (button pins)
 	PORTC |= _BV(PC3) | _BV(PC7);
-
-	// Enable 8bit counter with prescaler=8 (-> timer frequency = 1MHz)
-	TCCR0A = _BV(CS01);
-	// raise timer interrupt on counter overflow (-> interrupt frequency = ~4kHz)
-	TIMSK0 = _BV(TOIE0);
 
 	disp[0] = 0x01;
 	disp[1] = 0x02;
@@ -78,6 +67,7 @@ int main (void)
 	disp[31] = 0x00;
 #endif
 
+	display.enable();
 	modem.enable();
 
 	sei();
@@ -86,6 +76,8 @@ int main (void)
 		// nothing to do here, go to idle to save power
 		SMCR = _BV(SE);
 		asm("sleep");
+		// The display timer causes a wakeup after 256µs. Run the system
+		// loop after the timer's ISR is done.
 		rocket.loop();
 	}
 

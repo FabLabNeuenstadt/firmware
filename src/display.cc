@@ -10,16 +10,23 @@ Display display;
 
 extern volatile uint8_t disp[8];
 
-void Display::turn_off()
+void Display::disable()
 {
 	TIMSK0 &= ~_BV(TOIE0);
 	PORTB = 0;
 	PORTD = 0;
 }
 
-void Display::turn_on()
+void Display::enable()
 {
-	TIMSK0 |= _BV(TOIE0);
+	// Ports B and D drive the dot matrix display -> set all as output
+	DDRB = 0xff;
+	DDRD = 0xff;
+
+	// Enable 8bit counter with prescaler=8 (-> timer frequency = 1MHz)
+	TCCR0A = _BV(CS01);
+	// raise timer interrupt on counter overflow (-> interrupt frequency = ~4kHz)
+	TIMSK0 = _BV(TOIE0);
 }
 
 /*

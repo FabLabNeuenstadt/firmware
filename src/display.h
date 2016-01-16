@@ -7,8 +7,8 @@
 class Display {
 	public:
 		Display() {};
-		void turn_on(void);
-		void turn_off(void);
+		void enable(void);
+		void disable(void);
 };
 
 extern Display display;

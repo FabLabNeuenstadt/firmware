@@ -32,7 +32,7 @@ void System::loop()
 		else {
 
 			// turn off display to indicate we're about to shut down
-			display.turn_off();
+			display.disable();
 
 			modem.disable();
 
@@ -57,7 +57,7 @@ void System::loop()
 			PCMSK1 &= ~(_BV(PCINT15) | _BV(PCINT11));
 
 			// turn on display
-			display.turn_on();
+			display.enable();
 
 			// ... and modem
 			modem.enable();
