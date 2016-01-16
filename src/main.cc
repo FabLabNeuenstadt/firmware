@@ -5,7 +5,7 @@
 #include <stdlib.h>
 
 #include "display.h"
-#include "font2.h"
+#include "font.h"
 #include "modem.h"
 #include "system.h"
 
