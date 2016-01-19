@@ -12,11 +12,10 @@
 
 System rocket;
 
-extern volatile uint8_t disp[8];
-
 void System::loop()
 {
 	static uint8_t i = 0;
+	char modem_char;
 	// both buttons are pressed
 	if ((PINC & (_BV(PC3) | _BV(PC7))) == 0) {
 		// naptime!
@@ -70,9 +69,13 @@ void System::loop()
 	}
 
 	while (modem.buffer_available()) {
-		disp[i++] = modem.buffer_get();
-		if (i == 8)
+		modem_char = modem.buffer_get();
+		display.string[i++] = modem_char;
+		if (i == 127) {
 			i = 0;
+		} else if (modem_char == 0) {
+			i = 0;
+		}
 	}
 }
 

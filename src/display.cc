@@ -5,10 +5,11 @@
 #include <stdlib.h>
 
 #include "display.h"
+#include "font.h"
 
 Display display;
 
-extern volatile uint8_t disp[8];
+uint8_t teststr[] = {'O', 'h', 'a', 'i', '!', 0};
 
 void Display::disable()
 {
@@ -41,22 +42,14 @@ ISR(TIMER0_OVF_vect)
 {
 	static uint8_t active_col = 0;
 	static uint16_t scroll = 0;
-	static uint8_t disp_offset = 0;
 
-	static uint8_t disp_buf[8];
+	static uint8_t disp_buf[] = {0xff,0xfb,0xdd,0xfd,0xdd,0xfb,0xff,0xff};
 
-	uint8_t i;
+	static uint8_t str_pos = 0;
+	static int8_t char_pos = -1;
 
-	if (++scroll == 512) {
-		scroll = 0;
-		if (++disp_offset == sizeof(disp)) {
-			disp_offset = 0;
-		}
-
-		for (i = 0; i < 8; i++) {
-			disp_buf[i] = ~disp[(disp_offset + i) % sizeof(disp)];
-		}
-	}
+	uint8_t i, glyph_len;
+	uint8_t *glyph_addr;
 
 	/*
 	 * To avoid flickering, do not put any code (or expensive index
@@ -68,4 +61,31 @@ ISR(TIMER0_OVF_vect)
 
 	if (++active_col == 8)
 		active_col = 0;
+
+	if (++scroll == 512) {
+		scroll = 0;
+
+		for (i = 0; i < 7; i++) {
+			disp_buf[i] = disp_buf[i+1];
+		}
+
+		glyph_addr = (uint8_t *)pgm_read_ptr(&font[(uint8_t)display.string[str_pos]]);
+		glyph_len = pgm_read_byte(&glyph_addr[0]);
+		char_pos++;
+
+		if (char_pos > glyph_len) {
+			char_pos = 0;
+			str_pos++;
+		}
+
+		if (display.string[str_pos] == 0) {
+			str_pos = 0;
+		}
+
+		if (char_pos == 0) {
+			disp_buf[7] = 0xff; // whitespace
+		} else {
+			disp_buf[7] = ~pgm_read_byte(&glyph_addr[char_pos]);
+		}
+	}
 }

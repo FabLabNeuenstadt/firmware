@@ -9,6 +9,7 @@ class Display {
 		Display() {};
 		void enable(void);
 		void disable(void);
+		char string[128];
 };
 
 extern Display display;
