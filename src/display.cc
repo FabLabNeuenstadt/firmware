@@ -86,6 +86,14 @@ void Display::multiplex()
 	}
 }
 
+void Display::reset()
+{
+	for (int i = 0; i < 8; i++)
+		disp_buf[i] = 0xff;
+	str_pos = 0;
+	char_pos = -1;
+}
+
 /*
  * Draws a single display column. This function should be called at least once
  * per millisecond.

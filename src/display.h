@@ -15,6 +15,7 @@ class Display {
 		void enable(void);
 		void disable(void);
 		void multiplex(void);
+		void reset(void);
 		char string[128];
 };
 
