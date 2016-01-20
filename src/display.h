@@ -5,8 +5,13 @@
 #include <stdlib.h>
 
 class Display {
+	private:
+		uint8_t active_col;
+		uint8_t disp_buf[8];
+		uint8_t str_pos;
+		int8_t char_pos;
 	public:
-		Display() {};
+		Display();
 		void enable(void);
 		void disable(void);
 		void multiplex(void);

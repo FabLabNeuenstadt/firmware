@@ -9,6 +9,19 @@
 
 Display display;
 
+Display::Display()
+{
+	disp_buf[0] = 0xff;
+	disp_buf[1] = 0xfb;
+	disp_buf[2] = 0xdd;
+	disp_buf[3] = 0xfd;
+	disp_buf[4] = 0xdd;
+	disp_buf[5] = 0xfb;
+	disp_buf[6] = 0xff;
+	disp_buf[7] = 0xff;
+	char_pos = -1;
+}
+
 void Display::disable()
 {
 	TIMSK0 &= ~_BV(TOIE0);
@@ -30,14 +43,7 @@ void Display::enable()
 
 void Display::multiplex()
 {
-	static uint8_t active_col = 0;
-	static uint16_t scroll = 0;
-
-	static uint8_t disp_buf[] = {0xff,0xfb,0xdd,0xfd,0xdd,0xfb,0xff,0xff};
-
-	static uint8_t str_pos = 0;
-	static int8_t char_pos = -1;
-
+	static uint16_t scroll;
 	uint8_t i, glyph_len;
 	uint8_t *glyph_addr;
 

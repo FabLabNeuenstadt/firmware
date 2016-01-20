@@ -11,7 +11,7 @@
 #include <stdlib.h>
 
 /* Modem ring buffer size must be power of 2 */
-#define MODEM_BUFFER_SIZE	4
+#define MODEM_BUFFER_SIZE	8
 
 /* Modem defines */
 #define MODEM_SYNC_LEN		42
@@ -23,6 +23,11 @@
 #define MODEM_DDR		DDRA
 
 class Modem {
+	private:
+		uint8_t buffer_head;
+		uint8_t buffer_tail;
+		uint8_t buffer[MODEM_BUFFER_SIZE];
+		void buffer_put(const uint8_t c);
 	public:
 		Modem() {};
 		uint8_t buffer_available(void);

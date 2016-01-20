@@ -11,26 +11,22 @@
 #include <stdlib.h>
 #include "modem.h"
 
-/* Ring buffer global variables */
-static volatile uint8_t modem_buffer_head = 0, modem_buffer_tail = 0;
-static volatile uint8_t modem_buffer[MODEM_BUFFER_SIZE];
-
 Modem modem;
 
 /*
  * Returns number of available bytes in ringbuffer or 0 if empty
  */
 uint8_t Modem::buffer_available() {
-	return modem_buffer_head - modem_buffer_tail;
+	return buffer_head - buffer_tail;
 }
 
 /*
  * Store 1 byte in ringbuffer
  */
-static inline void modem_buffer_put(const uint8_t c) {
+inline void Modem::buffer_put(const uint8_t c) {
 	if (modem.buffer_available() != MODEM_BUFFER_SIZE) {
-		modem_buffer[modem_buffer_head++ % MODEM_BUFFER_SIZE] = c;
-	} 
+		buffer[buffer_head++ % MODEM_BUFFER_SIZE] = c;
+	}
 }
 
 /*
@@ -39,7 +35,7 @@ static inline void modem_buffer_put(const uint8_t c) {
 uint8_t Modem::buffer_get() {
 	uint8_t b = 0;
 	if (buffer_available() != 0) {
-		b = modem_buffer[modem_buffer_tail++ % MODEM_BUFFER_SIZE];
+		b = buffer[buffer_tail++ % MODEM_BUFFER_SIZE];
 	}
 	return b;
 }
@@ -98,7 +94,7 @@ void Modem::receive() {
 
 	/* Check if we received complete byte and store it in ring buffer */
 	if (!(++modem_bit % 0x08)) {
-		modem_buffer_put(modem_byte);
+		buffer_put(modem_byte);
 	}
 }
 
