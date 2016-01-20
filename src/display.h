@@ -9,6 +9,7 @@ class Display {
 		Display() {};
 		void enable(void);
 		void disable(void);
+		void multiplex(void);
 		char string[128];
 };
 

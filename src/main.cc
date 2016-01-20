@@ -25,7 +25,8 @@ int main (void)
 	display.string[2] = 'a';
 	display.string[3] = 'i';
 	display.string[4] = '!';
-	display.string[5] = 0;
+	display.string[5] = ' ';
+	display.string[6] = 0;
 
 	display.enable();
 	modem.enable();

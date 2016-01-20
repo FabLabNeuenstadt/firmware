@@ -9,8 +9,6 @@
 
 Display display;
 
-uint8_t teststr[] = {'O', 'h', 'a', 'i', '!', 0};
-
 void Display::disable()
 {
 	TIMSK0 &= ~_BV(TOIE0);
@@ -30,15 +28,7 @@ void Display::enable()
 	TIMSK0 = _BV(TOIE0);
 }
 
-/*
- * Draws a single display column. This function should be called at least once
- * per millisecond.
- *
- * Current configuration:
- * Called every 256 microseconds. The whole display is refreshed every 2048us,
- * giving a refresh rate of ~500Hz
- */
-ISR(TIMER0_OVF_vect)
+void Display::multiplex()
 {
 	static uint8_t active_col = 0;
 	static uint16_t scroll = 0;
@@ -88,4 +78,17 @@ ISR(TIMER0_OVF_vect)
 			disp_buf[7] = ~pgm_read_byte(&glyph_addr[char_pos]);
 		}
 	}
+}
+
+/*
+ * Draws a single display column. This function should be called at least once
+ * per millisecond.
+ *
+ * Current configuration:
+ * Called every 256 microseconds. The whole display is refreshed every 2048us,
+ * giving a refresh rate of ~500Hz
+ */
+ISR(TIMER0_OVF_vect)
+{
+	display.multiplex();
 }
