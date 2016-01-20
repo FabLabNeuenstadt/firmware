@@ -6,6 +6,7 @@
 
 class Display {
 	private:
+		uint16_t scroll_delay;
 		uint8_t active_col;
 		uint8_t disp_buf[8];
 		uint8_t str_pos;

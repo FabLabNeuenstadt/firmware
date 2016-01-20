@@ -20,6 +20,7 @@ Display::Display()
 	disp_buf[6] = 0xff;
 	disp_buf[7] = 0xff;
 	char_pos = -1;
+	scroll_delay = 400;
 }
 
 void Display::disable()
@@ -58,7 +59,7 @@ void Display::multiplex()
 	if (++active_col == 8)
 		active_col = 0;
 
-	if (++scroll == 512) {
+	if (++scroll == scroll_delay) {
 		scroll = 0;
 
 		for (i = 0; i < 7; i++) {
