@@ -1,13 +1,16 @@
 #!/bin/zsh
 
-python modem.py =(echo -n "$1"$'\0') /tmp/wat.wav
+OUT="$(mktemp)"
+
+python modem.py =(echo -n "$1"$'\0') $OUT
 
 case "$(uname -s)" in
 Darwin)
-   	play /tmp/wat.wav
+   	play $OUT
    	;;
 *) 
-    aplay /tmp/wat.wav
+    aplay $OUT
     ;;
 esac
 
+rm $OUT
