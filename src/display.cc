@@ -11,14 +11,6 @@ Display display;
 
 Display::Display()
 {
-	disp_buf[0] = 0xff;
-	disp_buf[1] = 0xfb;
-	disp_buf[2] = 0xdd;
-	disp_buf[3] = 0xfd;
-	disp_buf[4] = 0xdd;
-	disp_buf[5] = 0xfb;
-	disp_buf[6] = 0xff;
-	disp_buf[7] = 0xff;
 	char_pos = -1;
 	scroll_delay = 400;
 }
@@ -89,10 +81,18 @@ void Display::multiplex()
 
 void Display::reset()
 {
-	for (int i = 0; i < 8; i++)
+	for (uint8_t i = 0; i < 8; i++)
 		disp_buf[i] = 0xff;
 	str_pos = 0;
 	char_pos = -1;
+}
+
+void Display::setString(char *new_str)
+{
+	reset();
+	for (uint8_t i = 0; new_str[i] != 0; i++) {
+		string[i] = new_str[i];
+	}
 }
 
 /*

@@ -11,13 +11,14 @@ class Display {
 		uint8_t disp_buf[8];
 		uint8_t str_pos;
 		int8_t char_pos;
+		char string[128];
 	public:
 		Display();
 		void enable(void);
 		void disable(void);
 		void multiplex(void);
 		void reset(void);
-		char string[128];
+		void setString(char *str);
 };
 
 extern Display display;

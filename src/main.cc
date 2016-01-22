@@ -20,13 +20,7 @@ int main (void)
 	// Enable pull-ups on PC3 and PC7 (button pins)
 	PORTC |= _BV(PC3) | _BV(PC7);
 
-	display.string[0] = 'O';
-	display.string[1] = 'h';
-	display.string[2] = 'a';
-	display.string[3] = 'i';
-	display.string[4] = '!';
-	display.string[5] = ' ';
-	display.string[6] = 0;
+	display.setString("Ohai! ");
 
 	display.enable();
 	modem.enable();
