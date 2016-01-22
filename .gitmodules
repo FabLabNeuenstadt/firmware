@@ -1,0 +1,3 @@
+[submodule "src/Hamming"]
+	path = src/Hamming
+	url = https://github.com/RobotRoom/Hamming.git
