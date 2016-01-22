@@ -38,7 +38,7 @@ int main (void)
 		 * it means we can immediately process the received data.
 		 */
 		rocket.loop();
-		display.scroll();
+		display.update();
 	}
 
 	return 0;

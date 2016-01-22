@@ -12,7 +12,7 @@ Display display;
 Display::Display()
 {
 	char_pos = -1;
-	scroll_delay = 400;
+	update_delay = 400;
 }
 
 void Display::disable()
@@ -49,17 +49,17 @@ void Display::multiplex()
 	if (++active_col == 8)
 		active_col = 0;
 
-	if (++scroll == scroll_delay) {
+	if (++scroll == update_delay) {
 		scroll = 0;
-		need_scroll = 1;
+		need_update = 1;
 	}
 }
 
-void Display::scroll() {
+void Display::update() {
 	uint8_t i, glyph_len;
 	uint8_t *glyph_addr;
-	if (need_scroll) {
-		need_scroll = 0;
+	if (need_update) {
+		need_update = 0;
 
 		for (i = 0; i < 7; i++) {
 			disp_buf[i] = disp_buf[i+1];

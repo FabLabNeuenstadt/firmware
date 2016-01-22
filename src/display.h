@@ -6,8 +6,8 @@
 
 class Display {
 	private:
-		uint16_t scroll_delay;
-		uint8_t need_scroll;
+		uint16_t update_delay;
+		uint8_t need_update;
 		uint8_t active_col;
 		uint8_t disp_buf[8];
 		uint8_t str_pos;
@@ -19,7 +19,7 @@ class Display {
 		void disable(void);
 		void multiplex(void);
 		void reset(void);
-		void scroll(void);
+		void update(void);
 		void setString(const char *str);
 		void setString(char *str);
 };
