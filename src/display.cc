@@ -9,7 +9,19 @@
 
 Display display;
 
-uint8_t teststr[] = {'O', 'h', 'a', 'i', '!', 0};
+Display::Display()
+{
+	disp_buf[0] = 0xff;
+	disp_buf[1] = 0xfb;
+	disp_buf[2] = 0xdd;
+	disp_buf[3] = 0xfd;
+	disp_buf[4] = 0xdd;
+	disp_buf[5] = 0xfb;
+	disp_buf[6] = 0xff;
+	disp_buf[7] = 0xff;
+	char_pos = -1;
+	scroll_delay = 400;
+}
 
 void Display::disable()
 {
@@ -30,24 +42,9 @@ void Display::enable()
 	TIMSK0 = _BV(TOIE0);
 }
 
-/*
- * Draws a single display column. This function should be called at least once
- * per millisecond.
- *
- * Current configuration:
- * Called every 256 microseconds. The whole display is refreshed every 2048us,
- * giving a refresh rate of ~500Hz
- */
-ISR(TIMER0_OVF_vect)
+void Display::multiplex()
 {
-	static uint8_t active_col = 0;
-	static uint16_t scroll = 0;
-
-	static uint8_t disp_buf[] = {0xff,0xfb,0xdd,0xfd,0xdd,0xfb,0xff,0xff};
-
-	static uint8_t str_pos = 0;
-	static int8_t char_pos = -1;
-
+	static uint16_t scroll;
 	uint8_t i, glyph_len;
 	uint8_t *glyph_addr;
 
@@ -62,7 +59,7 @@ ISR(TIMER0_OVF_vect)
 	if (++active_col == 8)
 		active_col = 0;
 
-	if (++scroll == 512) {
+	if (++scroll == scroll_delay) {
 		scroll = 0;
 
 		for (i = 0; i < 7; i++) {
@@ -88,4 +85,25 @@ ISR(TIMER0_OVF_vect)
 			disp_buf[7] = ~pgm_read_byte(&glyph_addr[char_pos]);
 		}
 	}
+}
+
+void Display::reset()
+{
+	for (int i = 0; i < 8; i++)
+		disp_buf[i] = 0xff;
+	str_pos = 0;
+	char_pos = -1;
+}
+
+/*
+ * Draws a single display column. This function should be called at least once
+ * per millisecond.
+ *
+ * Current configuration:
+ * Called every 256 microseconds. The whole display is refreshed every 2048us,
+ * giving a refresh rate of ~500Hz
+ */
+ISR(TIMER0_OVF_vect)
+{
+	display.multiplex();
 }

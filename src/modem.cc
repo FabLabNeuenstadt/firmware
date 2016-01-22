@@ -11,26 +11,22 @@
 #include <stdlib.h>
 #include "modem.h"
 
-/* Ring buffer global variables */
-static volatile uint8_t modem_buffer_head = 0, modem_buffer_tail = 0;
-static volatile uint8_t modem_buffer[MODEM_BUFFER_SIZE];
-
 Modem modem;
 
 /*
  * Returns number of available bytes in ringbuffer or 0 if empty
  */
 uint8_t Modem::buffer_available() {
-	return modem_buffer_head - modem_buffer_tail;
+	return buffer_head - buffer_tail;
 }
 
 /*
  * Store 1 byte in ringbuffer
  */
-static inline void modem_buffer_put(const uint8_t c) {
+inline void Modem::buffer_put(const uint8_t c) {
 	if (modem.buffer_available() != MODEM_BUFFER_SIZE) {
-		modem_buffer[modem_buffer_head++ % MODEM_BUFFER_SIZE] = c;
-	} 
+		buffer[buffer_head++ % MODEM_BUFFER_SIZE] = c;
+	}
 }
 
 /*
@@ -39,15 +35,37 @@ static inline void modem_buffer_put(const uint8_t c) {
 uint8_t Modem::buffer_get() {
 	uint8_t b = 0;
 	if (buffer_available() != 0) {
-		b = modem_buffer[modem_buffer_tail++ % MODEM_BUFFER_SIZE];
+		b = buffer[buffer_tail++ % MODEM_BUFFER_SIZE];
 	}
 	return b;
 }
 
 /*
- * Pin Change Interrupt Vector. This is The Modem.
+ * Start the modem by enabling Pin Change Interrupts & Timer
  */
-ISR(PCINT3_vect) {
+void Modem::enable()  {
+	/* Enable R1 */
+	DDRA  |= _BV(PA3);
+	PORTA |= _BV(PA3);
+
+	/* Modem pin as input */
+	MODEM_DDR &= ~_BV(MODEM_PIN);
+
+	/* Enable Pin Change Interrupts and PCINT for MODEM_PIN */
+	MODEM_PCMSK |= _BV(MODEM_PCINT);
+	PCICR |= _BV(MODEM_PCIE);
+
+	/* Timer: TCCR1: CS10 and CS11 bits: 8MHz clock with Prescaler 64 = 125kHz timer clock */
+	TCCR1B = _BV(CS11) | _BV(CS10);
+}
+
+void Modem::disable()
+{
+	PORTA &= ~_BV(PA3);
+	DDRA  &= ~_BV(PA3);
+}
+
+void Modem::receive() {
 	/* Static variables instead of globals to keep scope inside ISR */
 	static uint8_t modem_bit = 0;
 	static uint8_t modem_bitlen = 0;
@@ -76,31 +94,13 @@ ISR(PCINT3_vect) {
 
 	/* Check if we received complete byte and store it in ring buffer */
 	if (!(++modem_bit % 0x08)) {
-		modem_buffer_put(modem_byte);
+		buffer_put(modem_byte);
 	}
 }
 
 /*
- * Start the modem by enabling Pin Change Interrupts & Timer
+ * Pin Change Interrupt Vector. This is The Modem.
  */
-void Modem::enable()  {
-	/* Enable R1 */
-	DDRA  |= _BV(PA3);
-	PORTA |= _BV(PA3);
-
-	/* Modem pin as input */
-	MODEM_DDR &= ~_BV(MODEM_PIN);
-
-	/* Enable Pin Change Interrupts and PCINT for MODEM_PIN */
-	MODEM_PCMSK |= _BV(MODEM_PCINT);
-	PCICR |= _BV(MODEM_PCIE);
-
-	/* Timer: TCCR1: CS10 and CS11 bits: 8MHz clock with Prescaler 64 = 125kHz timer clock */
-	TCCR1B = _BV(CS11) | _BV(CS10);
-}
-
-void Modem::disable()
-{
-	PORTA &= ~_BV(PA3);
-	DDRA  &= ~_BV(PA3);
+ISR(PCINT3_vect) {
+	modem.receive();
 }
