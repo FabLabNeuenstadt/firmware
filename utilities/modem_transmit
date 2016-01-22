@@ -2,4 +2,12 @@
 
 python modem.py =(echo -n "$1"$'\0') /tmp/wat.wav
 
-aplay /tmp/wat.wav
+case "$(uname -s)" in
+Darwin)
+   	play /tmp/wat.wav
+   	;;
+*) 
+    aplay /tmp/wat.wav
+    ;;
+esac
+
