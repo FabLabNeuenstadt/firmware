@@ -12,6 +12,8 @@
 
 System rocket;
 
+char disp_buf[128];
+
 void System::loop()
 {
 	static uint8_t i = 0;
@@ -70,12 +72,12 @@ void System::loop()
 
 	while (modem.buffer_available()) {
 		modem_char = modem.buffer_get();
-		display.string[i++] = modem_char;
+		disp_buf[i++] = modem_char;
 		if (i == 127) {
 			i = 0;
 		} else if (modem_char == 0) {
 			i = 0;
-			display.reset();
+			display.setString(disp_buf);
 		}
 	}
 }
