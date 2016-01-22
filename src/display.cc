@@ -37,8 +37,6 @@ void Display::enable()
 void Display::multiplex()
 {
 	static uint16_t scroll;
-	uint8_t i, glyph_len;
-	uint8_t *glyph_addr;
 
 	/*
 	 * To avoid flickering, do not put any code (or expensive index
@@ -53,6 +51,15 @@ void Display::multiplex()
 
 	if (++scroll == scroll_delay) {
 		scroll = 0;
+		need_scroll = 1;
+	}
+}
+
+void Display::scroll() {
+	uint8_t i, glyph_len;
+	uint8_t *glyph_addr;
+	if (need_scroll) {
+		need_scroll = 0;
 
 		for (i = 0; i < 7; i++) {
 			disp_buf[i] = disp_buf[i+1];
@@ -85,6 +92,11 @@ void Display::reset()
 		disp_buf[i] = 0xff;
 	str_pos = 0;
 	char_pos = -1;
+}
+
+void Display::setString(const char *new_str)
+{
+	setString((char *)new_str);
 }
 
 void Display::setString(char *new_str)
