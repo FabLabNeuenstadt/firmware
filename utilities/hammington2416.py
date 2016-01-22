@@ -25,7 +25,7 @@ for byte in f.read():
 		bytepos = 0
 		output += str(HammingCalculateParity2416(ord(oldbyte), ord(byte)))
 if bytepos == 1:
-	output += " "
-	output += str(HammingCalculateParity2416(ord(oldbyte), ord(" ")))
+	output += "\x00"
+	output += str(HammingCalculateParity2416(ord(oldbyte), ord("\x00")))
 
 print output
