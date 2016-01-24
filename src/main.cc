@@ -6,11 +6,16 @@
 
 #include "display.h"
 #include "font.h"
+#include "i2c.h"
 #include "modem.h"
 #include "system.h"
 
 int main (void)
 {
+	char testbuf[] = "..Olol I2C extra lang bla foo wololo moep   ";
+	char testbuf2[32];
+	testbuf[0] = 1;
+	testbuf[1] = 0;
 	// disable ADC to save power
 	PRR |= _BV(PRADC);
 
@@ -24,8 +29,17 @@ int main (void)
 
 	display.enable();
 	modem.enable();
+	i2c.enable();
 
 	sei();
+	//display.setString("tx");
+
+	i2c.xmit(64, 0, (uint8_t *)testbuf, (uint8_t *)testbuf);
+
+	//display.setString("rx");
+
+	i2c.xmit(2, 64, (uint8_t *)testbuf, (uint8_t *)testbuf2);
+	display.setString(testbuf2);
 
 	while (1) {
 		// nothing to do here, go to idle to save power

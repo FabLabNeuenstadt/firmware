@@ -102,11 +102,11 @@ void Display::setString(const char *new_str)
 void Display::setString(char *new_str)
 {
 	int i;
-	reset();
 	for (i = 0; new_str[i] != 0; i++) {
 		string[i] = new_str[i];
 	}
 	string[i] = 0; // trailing null byte
+	reset();
 }
 
 /*
