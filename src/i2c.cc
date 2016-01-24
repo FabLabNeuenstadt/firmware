@@ -21,6 +21,14 @@ void I2C::enable()
 
 // TODO Everything[tm] (error handling and generic code)
 // Also TODO: Use interrupts instead of polling
+/*
+ * This method encapsules both, transmit and read into one function.
+ * Although it could be split into read/write, all reads require a transmit.
+ * Hence this approach reduces code duplication.
+ * 
+ * num_tx, num_rx = number of byte to transmit/receive
+ * txbuf, rxbuf = pointer to the uint8_t array for tx/rx
+ */
 void I2C::xmit(int num_tx, int num_rx, uint8_t *txbuf, uint8_t *rxbuf)
 {
 	int i;
