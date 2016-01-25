@@ -12,7 +12,7 @@ Storage storage;
  *
  * Organized as 64B-pages, all animations/texts are page-aligned.  Byte 0 ..
  * 255 : storage metadata. Byte 0 contains the number of animations, byte 1 the
- * byte offset of the first animation, byte 2 of the second, and so on.
+ * page offset of the first animation, byte 2 of the second, and so on.
  * Byte 256+: texts/animations without additional storage metadata, aligned
  * to 64B. So, a maximum of 256-(256/64) = 252 texts/animations can be stored,
  * and a maximum of 255 * 64 = 16320 Bytes (almost 16 kB / 128 kbit) can be
