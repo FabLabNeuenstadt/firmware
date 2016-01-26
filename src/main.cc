@@ -12,6 +12,9 @@
 
 int main (void)
 {
+	text ohai;
+	ohai.str = (char *)"Ohai! ";
+
 	// disable ADC to save power
 	PRR |= _BV(PRADC);
 
@@ -21,7 +24,7 @@ int main (void)
 	// Enable pull-ups on PC3 and PC7 (button pins)
 	PORTC |= _BV(PC3) | _BV(PC7);
 
-	display.setString("Ohai! ");
+	display.show(ohai);
 
 	display.enable();
 	modem.enable();

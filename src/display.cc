@@ -94,16 +94,16 @@ void Display::reset()
 	char_pos = -1;
 }
 
-void Display::setString(const char *new_str)
+void Display::show(text t)
 {
-	setString((char *)new_str);
+	show(t.str);
 }
 
-void Display::setString(char *new_str)
+void Display::show(char *str)
 {
 	int i;
-	for (i = 0; new_str[i] != 0; i++) {
-		string[i] = new_str[i];
+	for (i = 0; str[i] != 0; i++) {
+		string[i] = str[i];
 	}
 	string[i] = 0; // trailing null byte
 	reset();

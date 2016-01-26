@@ -77,7 +77,7 @@ void System::loop()
 			i = 0;
 		} else if (modem_char == 0) {
 			i = 0;
-			display.setString(disp_buf);
+			display.show(disp_buf);
 		}
 	}
 }
