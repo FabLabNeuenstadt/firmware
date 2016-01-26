@@ -13,7 +13,7 @@
 int main (void)
 {
 	text ohai;
-	ohai.str = (char *)"Ohai! ";
+	ohai.str = (uint8_t *)"Ohai! ";
 
 	// disable ADC to save power
 	PRR |= _BV(PRADC);

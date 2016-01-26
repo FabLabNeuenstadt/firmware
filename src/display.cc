@@ -65,7 +65,7 @@ void Display::update() {
 			disp_buf[i] = disp_buf[i+1];
 		}
 
-		glyph_addr = (uint8_t *)pgm_read_ptr(&font[(uint8_t)display.string[str_pos]]);
+		glyph_addr = (uint8_t *)pgm_read_ptr(&font[display.data_buf[str_pos]]);
 		glyph_len = pgm_read_byte(&glyph_addr[0]);
 		char_pos++;
 
@@ -74,7 +74,7 @@ void Display::update() {
 			str_pos++;
 		}
 
-		if (display.string[str_pos] == 0) {
+		if (display.data_buf[str_pos] == 0) {
 			str_pos = 0;
 		}
 
@@ -99,13 +99,13 @@ void Display::show(text t)
 	show(t.str);
 }
 
-void Display::show(char *str)
+void Display::show(uint8_t *str)
 {
 	int i;
 	for (i = 0; str[i] != 0; i++) {
-		string[i] = str[i];
+		data_buf[i] = str[i];
 	}
-	string[i] = 0; // trailing null byte
+	data_buf[i] = 0; // trailing null byte
 	reset();
 }
 

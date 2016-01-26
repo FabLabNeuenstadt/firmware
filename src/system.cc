@@ -12,12 +12,12 @@
 
 System rocket;
 
-char disp_buf[128];
+uint8_t disp_buf[128];
 
 void System::loop()
 {
 	static uint8_t i = 0;
-	char modem_char;
+	uint8_t modem_byte;
 	// both buttons are pressed
 	if ((PINC & (_BV(PC3) | _BV(PC7))) == 0) {
 		// naptime!
@@ -71,11 +71,11 @@ void System::loop()
 	}
 
 	while (modem.buffer_available()) {
-		modem_char = modem.buffer_get();
-		disp_buf[i++] = modem_char;
+		modem_byte = modem.buffer_get();
+		disp_buf[i++] = modem_byte;
 		if (i == 127) {
 			i = 0;
-		} else if (modem_char == 0) {
+		} else if (modem_byte == 0) {
 			i = 0;
 			display.show(disp_buf);
 		}

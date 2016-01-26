@@ -7,13 +7,13 @@
 struct __text {
 	uint8_t speed_delay;
 	uint8_t direction_reserved;
-	char *str;
+	uint8_t *str;
 };
 
 struct __animation {
 	uint8_t speed;
 	uint8_t delay;
-	char *data;
+	uint8_t *data;
 };
 
 typedef struct __text text;
@@ -27,7 +27,7 @@ class Display {
 		uint8_t disp_buf[8];
 		uint8_t str_pos;
 		int8_t char_pos;
-		char string[128];
+		uint8_t data_buf[128];
 	public:
 		Display();
 		void enable(void);
@@ -38,7 +38,7 @@ class Display {
 		void update(void);
 
 		void show(text t);
-		void show(char *str);
+		void show(uint8_t *str);
 };
 
 extern Display display;
