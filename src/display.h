@@ -16,8 +16,8 @@ struct __animation {
 	uint8_t *data;
 };
 
-typedef struct __text text;
-typedef struct __animation animation;
+typedef struct __text text_t;
+typedef struct __animation animation_t;
 
 class Display {
 	private:
@@ -28,6 +28,11 @@ class Display {
 		uint8_t str_pos;
 		int8_t char_pos;
 		uint8_t data_buf[128];
+		enum DisplayMode : uint8_t {
+			TEXT = 1,
+			ANIMATION = 2
+		};
+		DisplayMode mode;
 	public:
 		Display();
 		void enable(void);
@@ -37,7 +42,8 @@ class Display {
 		void reset(void);
 		void update(void);
 
-		void show(text t);
+		void show(text_t text);
+		void show(animation_t anim);
 		void show(uint8_t *str);
 };
 

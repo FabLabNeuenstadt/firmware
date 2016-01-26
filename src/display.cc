@@ -61,27 +61,37 @@ void Display::update() {
 	if (need_update) {
 		need_update = 0;
 
-		for (i = 0; i < 7; i++) {
-			disp_buf[i] = disp_buf[i+1];
-		}
+		if (mode == TEXT) {
+			for (i = 0; i < 7; i++) {
+				disp_buf[i] = disp_buf[i+1];
+			}
 
-		glyph_addr = (uint8_t *)pgm_read_ptr(&font[display.data_buf[str_pos]]);
-		glyph_len = pgm_read_byte(&glyph_addr[0]);
-		char_pos++;
+			glyph_addr = (uint8_t *)pgm_read_ptr(&font[display.data_buf[str_pos]]);
+			glyph_len = pgm_read_byte(&glyph_addr[0]);
+			char_pos++;
 
-		if (char_pos > glyph_len) {
-			char_pos = 0;
-			str_pos++;
-		}
+			if (char_pos > glyph_len) {
+				char_pos = 0;
+				str_pos++;
+			}
 
-		if (display.data_buf[str_pos] == 0) {
-			str_pos = 0;
-		}
+			if (display.data_buf[str_pos] == 0) {
+				str_pos = 0;
+			}
 
-		if (char_pos == 0) {
-			disp_buf[7] = 0xff; // whitespace
-		} else {
-			disp_buf[7] = ~pgm_read_byte(&glyph_addr[char_pos]);
+			if (char_pos == 0) {
+				disp_buf[7] = 0xff; // whitespace
+			} else {
+				disp_buf[7] = ~pgm_read_byte(&glyph_addr[char_pos]);
+			}
+		} else if (mode == ANIMATION) {
+			for (i = 0; i < 8; i++) {
+				disp_buf[i] = ~display.data_buf[str_pos+i];
+			}
+			str_pos += 8;
+			if (str_pos == 32) {
+				str_pos = 0;
+			}
 		}
 	}
 }
@@ -94,9 +104,16 @@ void Display::reset()
 	char_pos = -1;
 }
 
-void Display::show(text t)
+void Display::show(text_t text)
 {
-	show(t.str);
+	mode = TEXT;
+	show(text.str);
+}
+
+void Display::show(animation_t anim)
+{
+	mode = ANIMATION;
+	show(anim.data);
 }
 
 void Display::show(uint8_t *str)

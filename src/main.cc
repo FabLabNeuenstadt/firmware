@@ -12,8 +12,13 @@
 
 int main (void)
 {
-	text ohai;
+	text_t ohai;
 	ohai.str = (uint8_t *)"Ohai! ";
+
+	//uint8_t anim_data[] = { 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0, 0, 0, 0, 0, 0, 0, 0 };
+
+	//animation_t test;
+	//test.data = anim_data;
 
 	// disable ADC to save power
 	PRR |= _BV(PRADC);
