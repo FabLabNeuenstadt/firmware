@@ -12,7 +12,6 @@ Display display;
 Display::Display()
 {
 	char_pos = -1;
-	update_delay = 400;
 }
 
 void Display::disable()
@@ -36,7 +35,7 @@ void Display::enable()
 
 void Display::multiplex()
 {
-	static uint16_t scroll;
+	static uint8_t scroll;
 
 	/*
 	 * To avoid flickering, do not put any code (or expensive index
@@ -46,12 +45,12 @@ void Display::multiplex()
 	PORTD = disp_buf[active_col];
 	PORTB = _BV(active_col);
 
-	if (++active_col == 8)
+	if (++active_col == 8) {
 		active_col = 0;
-
-	if (++scroll == update_delay) {
-		scroll = 0;
-		need_update = 1;
+		if (++scroll == active_text.speed) {
+			scroll = 0;
+			need_update = 1;
+		}
 	}
 }
 
@@ -107,12 +106,14 @@ void Display::reset()
 void Display::show(text_t text)
 {
 	mode = TEXT;
+	active_text = text;
 	show(text.str);
 }
 
 void Display::show(animation_t anim)
 {
 	mode = ANIMATION;
+	active_anim = anim;
 	show(anim.data);
 }
 

@@ -13,6 +13,7 @@
 int main (void)
 {
 	text_t ohai;
+	ohai.speed = (4 << 4) + 15;
 	ohai.str = (uint8_t *)"Ohai! ";
 
 	//uint8_t anim_data[] = { 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0, 0, 0, 0, 0, 0, 0, 0 };

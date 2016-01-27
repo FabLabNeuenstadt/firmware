@@ -5,8 +5,9 @@
 #include <stdlib.h>
 
 struct __text {
-	uint8_t speed_delay;
-	uint8_t direction_reserved;
+	uint8_t speed;
+	uint8_t delay;
+	uint8_t direction;
 	uint8_t *str;
 };
 
@@ -21,7 +22,8 @@ typedef struct __animation animation_t;
 
 class Display {
 	private:
-		uint16_t update_delay;
+		text_t active_text;
+		animation_t active_anim;
 		uint8_t need_update;
 		uint8_t active_col;
 		uint8_t disp_buf[8];
