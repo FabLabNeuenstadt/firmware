@@ -36,16 +36,19 @@ XXXX XXXX XXXX XXXX (MSB -> LSB)
                ---- (reserved)
 ```
 
+The speed and delay ranges from a numeric value from 0 (0000) to 15 (1111). The higher the number, the faster the speed and the longer the delay. A direction of 0 (0000) specifies a left direction, a direction of 1 (0001) specifies a right direction.
+
 ##### ANIMATION METADATA
 
-A *`ANIMMETA`* is a two byte (16 bit) length metadata field for animation type pattern. It encodes the frame rate in the first byte and the delay in the second byte.
+A *`ANIMMETA`* is a two byte (16 bit) length metadata field for animation type pattern. It encodes the frame rate in the lower nibble of the first byte and the delay in the lower nibble of the second byte.
 
 ```
-XXXXXXXX XXXXXXXX
+0000XXXX 0000XXXX
 <------> <------>
  SPEED     DELAY
 ```
 
+The speed and delay ranges from a numeric value from 0 (0000) to 15 (1111).
 ## Message format
 
 The message transmitted has to follow the following diagram:
