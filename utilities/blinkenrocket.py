@@ -155,10 +155,11 @@ class animationFrame():
 
 	# Header -> 4bit zero, 4bit speed, 4 bit zero, 4 bit direction
 	def getHeader(self):
-		return [self.speed, self.delay]
+		return [chr(self.speed), chr(self.delay)]
 
 	def getRepresentation(self):
 		return self.getHeader().extend(self.animation)
+
 
 class blinkenrocket():
 
