@@ -169,8 +169,9 @@ class blinkenrocket():
 
 
 if __name__ == '__main__':
-	m = modem()
-	m.setData(['M','U','Z','Y'])
-	print m.generateAudioFrames()
+	m = modem(parity=False)
+	#print list(open(sys.argv[1]).read())
+	m.setData(list(open(sys.argv[1]).read()))
+	m.saveAudio(sys.argv[2])
 
 
