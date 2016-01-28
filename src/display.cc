@@ -47,7 +47,7 @@ void Display::multiplex()
 
 	if (++active_col == 8) {
 		active_col = 0;
-		if (++scroll == active_text.speed) {
+		if (++scroll == active_anim->speed) {
 			scroll = 0;
 			need_update = 1;
 		}
@@ -60,12 +60,12 @@ void Display::update() {
 	if (need_update) {
 		need_update = 0;
 
-		if (mode == TEXT) {
+		if (active_anim->mode == AnimationType::TEXT) {
 			for (i = 0; i < 7; i++) {
 				disp_buf[i] = disp_buf[i+1];
 			}
 
-			glyph_addr = (uint8_t *)pgm_read_ptr(&font[display.data_buf[str_pos]]);
+			glyph_addr = (uint8_t *)pgm_read_ptr(&font[active_anim->data[str_pos]]);
 			glyph_len = pgm_read_byte(&glyph_addr[0]);
 			char_pos++;
 
@@ -74,7 +74,7 @@ void Display::update() {
 				str_pos++;
 			}
 
-			if (display.data_buf[str_pos] == 0) {
+			if (active_anim->data[str_pos] == 0) {
 				str_pos = 0;
 			}
 
@@ -83,12 +83,12 @@ void Display::update() {
 			} else {
 				disp_buf[7] = ~pgm_read_byte(&glyph_addr[char_pos]);
 			}
-		} else if (mode == ANIMATION) {
+		} else if (active_anim->mode == AnimationType::FRAMES) {
 			for (i = 0; i < 8; i++) {
-				disp_buf[i] = ~display.data_buf[str_pos+i];
+				disp_buf[i] = ~active_anim->data[str_pos+i];
 			}
 			str_pos += 8;
-			if (str_pos == 32) {
+			if (str_pos == active_anim->length) {
 				str_pos = 0;
 			}
 		}
@@ -103,27 +103,9 @@ void Display::reset()
 	char_pos = -1;
 }
 
-void Display::show(text_t text)
+void Display::show(animation_t *anim)
 {
-	mode = TEXT;
-	active_text = text;
-	show(text.str);
-}
-
-void Display::show(animation_t anim)
-{
-	mode = ANIMATION;
 	active_anim = anim;
-	show(anim.data);
-}
-
-void Display::show(uint8_t *str)
-{
-	int i;
-	for (i = 0; str[i] != 0; i++) {
-		data_buf[i] = str[i];
-	}
-	data_buf[i] = 0; // trailing null byte
 	reset();
 }
 

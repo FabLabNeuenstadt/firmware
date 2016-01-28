@@ -12,14 +12,19 @@
 
 int main (void)
 {
-	text_t ohai;
+	animation_t ohai;
+	ohai.mode = AnimationType::TEXT;
 	ohai.speed = (4 << 4) + 15;
-	ohai.str = (uint8_t *)"Ohai! ";
+	ohai.data = (uint8_t *)"Ohai! ";
+	ohai.length = 6;
 
-	//uint8_t anim_data[] = { 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0, 0, 0, 0, 0, 0, 0, 0 };
+	uint8_t anim_data[] = { 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0, 0, 0, 0, 0, 0, 0, 0 };
 
-	//animation_t test;
-	//test.data = anim_data;
+	animation_t test;
+	test.mode = AnimationType::FRAMES;
+	test.speed = 14;
+	test.length = 2*8;
+	test.data = anim_data;
 
 	// disable ADC to save power
 	PRR |= _BV(PRADC);
@@ -30,7 +35,7 @@ int main (void)
 	// Enable pull-ups on PC3 and PC7 (button pins)
 	PORTC |= _BV(PC3) | _BV(PC7);
 
-	display.show(ohai);
+	display.show(&ohai);
 
 	display.enable();
 	modem.enable();
