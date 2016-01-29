@@ -10,11 +10,12 @@
 #include "modem.h"
 #include "system.h"
 
+animation_t ohai;
+
 int main (void)
 {
-	animation_t ohai;
 	ohai.mode = AnimationType::TEXT;
-	ohai.speed = (4 << 4) + 15;
+	ohai.speed = (2 << 4) + 15;
 	ohai.data = (uint8_t *)"\001 Ohai  ";
 	ohai.length = 8;
 
