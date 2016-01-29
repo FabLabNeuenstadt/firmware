@@ -50,5 +50,51 @@ class TestAnimation(unittest.TestCase):
     anim = animationFrame([],speed=7,delay=8)
     self.assertEquals(anim.getHeader(),[chr(7),chr(8)])
 
+class TestText(unittest.TestCase):
+
+  def test_speedDefault(self):
+    text = textFrame([])
+    self.assertEquals(ord(text.getHeader()[0]),(1 << 4 | 0))
+
+  def test_speedOkay(self):
+    text = textFrame([],speed=7)
+    self.assertEquals(ord(text.getHeader()[0]),(7 << 4 | 0))
+
+  def test_speedNotOkay(self):
+    text = textFrame([],speed=70)
+    self.assertEquals(ord(text.getHeader()[0]),(1 << 4 | 0))
+
+  def test_delayDefault(self):
+    text = textFrame([])
+    self.assertEquals(ord(text.getHeader()[0]),(1 << 4 | 0))
+
+  def test_delayOkay(self):
+    text = textFrame([],delay=7)
+    self.assertEquals(ord(text.getHeader()[0]),(1 << 4 | 7))
+
+  def test_delayNotOkay(self):
+    text = textFrame([],delay=70)
+    self.assertEquals(ord(text.getHeader()[0]),(1 << 4 | 0))
+
+  def test_directionDefault(self):
+    text = textFrame([])
+    self.assertEquals(ord(text.getHeader()[1]),0)
+
+  def test_directionOkay(self):
+    text = textFrame([],direction=1)
+    self.assertEquals(ord(text.getHeader()[1]),(1 << 4 | 0))
+
+  def test_directionNotOkay(self):
+    text = textFrame([],direction=7)
+    self.assertEquals(ord(text.getHeader()[1]),0)
+
+  def test_defaultHeaderOK(self):
+    text = textFrame([])
+    self.assertEquals(text.getHeader(),[chr(1 << 4 | 0),chr(0)])
+
+  def test_differentHeaderOK(self):
+    text = textFrame([],speed=7,delay=8,direction=1)
+    self.assertEquals(text.getHeader(),[chr(7 << 4 | 8),chr(1 << 4 | 0)])
+
 if __name__ == '__main__':
     unittest.main()
