@@ -134,7 +134,10 @@ class textFrame(Frame):
 		return [chr(self.speed << 4 | self.delay), chr(self.direction << 4 | 0x00)]
 
 	def getRepresentation(self):
-		return self.getHeader().append(list(self.text))
+		retval = []
+		retval.extend(self.getHeader())
+		retval.extend(list(self.text))
+		return retval
 
 class animationFrame(Frame):
 	animation = []
@@ -163,7 +166,10 @@ class animationFrame(Frame):
 		return [chr(self.speed), chr(self.delay)]
 
 	def getRepresentation(self):
-		return self.getHeader().extend(self.animation)
+		retval = []
+		retval.extend(self.getHeader())
+		retval.extend(self.animation)
+		return retval
 
 
 class blinkenrocket():
@@ -180,7 +186,7 @@ class blinkenrocket():
 		if not isinstance(frame, Frame):
 			raise RuntimeError("Incorrect frame supplied")
 		else:
-			frames.append(frame)
+			self.frames.append(frame)
 
 	def getMessage(self):
 		output = [self.startcode, self.startcode]
