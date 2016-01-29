@@ -103,7 +103,12 @@ class modem:
 		wav.writeframes(self.generateAudioFrames())
 		wav.close()
 
-class textFrame():
+class Frame( object ):
+    """ Returns the representation """
+    def getRepresentation( self ):
+        raise NotImplementedError( "Should have implemented this" )
+
+class textFrame(Frame):
 	text = ""
 	speed = 0
 	delay = 0
@@ -131,7 +136,7 @@ class textFrame():
 	def getRepresentation(self):
 		return self.getHeader().append(list(self.text))
 
-class animationFrame():
+class animationFrame(Frame):
 	animation = []
 	speed = 0
 	delay = 0
@@ -164,9 +169,27 @@ class animationFrame():
 class blinkenrocket():
 
 	eeprom_size = 65536
+	startcode = chr(0x99)
+	patterncode = chr(0xA9)
+	frames = []
 
 	def __init__(self,eeprom_size=65536):
-		pass
+		self.eeprom_size = eeprom_size if eeprom_size < 256*1024*1024 else 65536
+	
+	def addFrame(self, frame):
+		if not isinstance(frame, Frame):
+			raise RuntimeError("Incorrect frame supplied")
+		else:
+			frames.append(frame)
+
+	def getMessage(self):
+		output = [self.startcode, self.startcode]
+		for frame in self.frames:
+			output.extend([self.patterncode,self.patterncode])
+			output.extend(frame.getRepresentation())
+		return output
+
+
 
 
 if __name__ == '__main__':
