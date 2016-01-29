@@ -15,8 +15,8 @@ int main (void)
 	animation_t ohai;
 	ohai.mode = AnimationType::TEXT;
 	ohai.speed = (4 << 4) + 15;
-	ohai.data = (uint8_t *)"Ohai! ";
-	ohai.length = 6;
+	ohai.data = (uint8_t *)"\001 Ohai  ";
+	ohai.length = 8;
 
 	uint8_t anim_data[] = { 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0, 0, 0, 0, 0, 0, 0, 0 };
 

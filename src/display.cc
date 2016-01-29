@@ -74,10 +74,6 @@ void Display::update() {
 				str_pos++;
 			}
 
-			if (active_anim->data[str_pos] == 0) {
-				str_pos = 0;
-			}
-
 			if (char_pos == 0) {
 				disp_buf[7] = 0xff; // whitespace
 			} else {
@@ -88,9 +84,9 @@ void Display::update() {
 				disp_buf[i] = ~active_anim->data[str_pos+i];
 			}
 			str_pos += 8;
-			if (str_pos == active_anim->length) {
-				str_pos = 0;
-			}
+		}
+		if (str_pos >= active_anim->length) {
+			str_pos = 0;
 		}
 	}
 }
