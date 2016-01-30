@@ -6,13 +6,17 @@
 
 #define SHUTDOWN_THRESHOLD 2048
 
+/**
+ * Contains the system idle loop. Checks for button presses, handles
+ * standby/resume, reads data from the Modem and updates the Display.
+ */
 class System {
 	private:
 		uint16_t want_shutdown;
+		void shutdown(void);
 	public:
 		System() { want_shutdown = 0; };
 		void loop(void);
-		void shutdown(void);
 };
 
 extern System rocket;

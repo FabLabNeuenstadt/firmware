@@ -33,37 +33,7 @@ void System::loop()
 			want_shutdown++;
 		}
 		else {
-
-			// turn off display to indicate we're about to shut down
-			display.disable();
-
-			modem.disable();
-
-			// wait until both buttons are released
-			while (!((PINC & _BV(PC3)) && (PINC & _BV(PC7)))) ;
-
-			// and some more to debounce the buttons
-			_delay_ms(10);
-
-			// actual naptime
-
-			// enable PCINT on PC3 (PCINT11) and PC7 (PCINT15) for wakeup
-			PCMSK1 |= _BV(PCINT15) | _BV(PCINT11);
-			PCICR |= _BV(PCIE1);
-
-			// go to power-down mode
-			SMCR = _BV(SM1) | _BV(SE);
-			asm("sleep");
-
-			// execution will resume here - disable PCINT again.
-			// Don't disable PCICR, something else might need it.
-			PCMSK1 &= ~(_BV(PCINT15) | _BV(PCINT11));
-
-			// turn on display
-			display.enable();
-
-			// ... and modem
-			modem.enable();
+			shutdown();
 
 			want_shutdown = 0;
 		}
@@ -84,6 +54,40 @@ void System::loop()
 			i = 0;
 		}
 	}
+}
+
+void System::shutdown()
+{
+	// turn off display to indicate we're about to shut down
+	display.disable();
+
+	modem.disable();
+
+	// wait until both buttons are released
+	while (!((PINC & _BV(PC3)) && (PINC & _BV(PC7)))) ;
+
+	// and some more to debounce the buttons
+	_delay_ms(10);
+
+	// actual naptime
+
+	// enable PCINT on PC3 (PCINT11) and PC7 (PCINT15) for wakeup
+	PCMSK1 |= _BV(PCINT15) | _BV(PCINT11);
+	PCICR |= _BV(PCIE1);
+
+	// go to power-down mode
+	SMCR = _BV(SM1) | _BV(SE);
+	asm("sleep");
+
+	// execution will resume here - disable PCINT again.
+	// Don't disable PCICR, something else might need it.
+	PCMSK1 &= ~(_BV(PCINT15) | _BV(PCINT11));
+
+	// turn on display
+	display.enable();
+
+	// ... and modem
+	modem.enable();
 }
 
 ISR(PCINT1_vect)
