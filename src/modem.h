@@ -22,6 +22,11 @@
 #define MODEM_PIN		PA0
 #define MODEM_DDR		DDRA
 
+/**
+ * Receive-only modem. Sets up a pin change interrupt on the modem pin
+ * and receives bytes using a simple protocol. Does not detect or correct
+ * transmission errors. Exposes a global modem object for convenience.
+ */
 class Modem {
 	private:
 		uint8_t buffer_head;
@@ -30,10 +35,38 @@ class Modem {
 		void buffer_put(const uint8_t c);
 	public:
 		Modem() {};
+
+		/**
+		 * Checks if there are unprocessed bytes in the modem receive buffer.
+		 * @return number of unprocessed bytes
+		 */
 		uint8_t buffer_available(void);
+
+		/**
+		 * Get next byte from modem receive buffer.
+		 * @return next unprocessed byte (0 if the buffer is empty)
+		 */
 		uint8_t buffer_get(void);
+
+		/**
+		 * Enable the modem. Turns on the input voltage divider on MODEM_PIN
+		 * and enables the receive interrupt (MODEM_PCINT).
+		 */
 		void enable(void);
+
+		/**
+		 * Disable the modem. Disables the receive interrupt and turns off
+		 * the input voltage divider on MODEM_PIN.
+		 */
 		void disable(void);
+
+		/**
+		 * Called by the pin change interrupt service routine whenever the
+		 * modem pin is toggled. Detects sync pulses, receives bits and
+		 * stores complete bytes in the buffer.
+		 *
+		 * Do not call this function yourself.
+		 */
 		void receive(void);
 };
 

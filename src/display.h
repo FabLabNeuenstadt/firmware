@@ -4,6 +4,10 @@
 #include <util/delay.h>
 #include <stdlib.h>
 
+/**
+ * Describes the type of an animation object. The Storage class reserves four
+ * bits for the animation type, so up to 16 types are supported.
+ */
 enum class AnimationType : uint8_t {
 	TEXT = 1,
 	FRAMES = 2
@@ -26,7 +30,7 @@ struct animation {
 	uint8_t length;
 
 	/**
-	 * * If mode == TEXT: Text scroll speed in columns per TODO
+	 * * If mode == AnimationType::TEXT: Text scroll speed in columns per TODO
 	 * * If mode == FRAMES: Frames per TODO
 	 */
 	uint8_t speed;
@@ -42,7 +46,7 @@ struct animation {
 	uint8_t direction;
 
 	/**
-	 * * If mode == TEXT: character array pointing to the
+	 * * If mode == AnimationType::TEXT: character array pointing to the
 	 *   animation text in standard ASCII format (+ special font chars)
 	 * * If mode == FRAMES: Frame array. Each element encodes
 	 *   a display column (starting with the leftmost one), each group of

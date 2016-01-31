@@ -16,6 +16,14 @@ class System {
 		void shutdown(void);
 	public:
 		System() { want_shutdown = 0; };
+
+		/**
+		 * System idle loop. Checks for button presses, handles
+		 * standby/resume, reads data from the Modem and updates the Display.
+		 *
+		 * It is recommended to run this function before going back to sleep
+		 * whenever the system is woken up by an interrupt.
+		 */
 		void loop(void);
 };
 
