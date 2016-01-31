@@ -1,5 +1,3 @@
-#include <avr/io.h>
-#include <avr/interrupt.h>
 #include <stdlib.h>
 
 #define I2C_EEPROM_ADDR 0x50
