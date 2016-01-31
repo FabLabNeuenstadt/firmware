@@ -91,10 +91,10 @@ class modem:
 			sound += self.modemcode(ord(byte))
 			self.cnt += 1
 			if self.cnt == 10:
-				sound += m.generateSyncSignal(2)
+				sound += self.generateSyncSignal(2)
 				self.cnt = 0
 		# add some sync signals in the end
-		sound += m.generateSyncSignal(4)
+		sound += self.generateSyncSignal(4)
 		return sound
 
 	def saveAudio(self,filename):
