@@ -55,7 +55,6 @@ int main (void)
 		 * it means we can immediately process the received data.
 		 */
 		rocket.loop();
-		display.update();
 	}
 
 	return 0;

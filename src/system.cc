@@ -54,6 +54,8 @@ void System::loop()
 			i = 0;
 		}
 	}
+
+	display.update();
 }
 
 void System::shutdown()
