@@ -6,6 +6,7 @@
 
 #include "display.h"
 #include "modem.h"
+#include "storage.h"
 #include "system.h"
 
 #define SHUTDOWN_THRESHOLD 2048
@@ -15,6 +16,24 @@ System rocket;
 extern animation_t ohai;
 
 uint8_t disp_buf[128];
+
+void System::initialize()
+{
+	// disable ADC to save power
+	PRR |= _BV(PRADC);
+
+	// dito
+	wdt_disable();
+
+	// Enable pull-ups on PC3 and PC7 (button pins)
+	PORTC |= _BV(PC3) | _BV(PC7);
+
+	display.enable();
+	modem.enable();
+	storage.enable();
+
+	sei();
+}
 
 void System::loop()
 {
