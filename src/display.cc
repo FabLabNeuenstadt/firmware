@@ -58,33 +58,44 @@ void Display::update() {
 	if (need_update) {
 		need_update = 0;
 
-		if (active_anim->type == AnimationType::TEXT) {
-			for (i = 0; i < 7; i++) {
-				disp_buf[i] = disp_buf[i+1];
-			}
+		if (status == RUNNING) {
+			if (active_anim->type == AnimationType::TEXT) {
+				for (i = 0; i < 7; i++) {
+					disp_buf[i] = disp_buf[i+1];
+				}
 
-			glyph_addr = (uint8_t *)pgm_read_ptr(&font[active_anim->data[str_pos]]);
-			glyph_len = pgm_read_byte(&glyph_addr[0]);
-			char_pos++;
+				glyph_addr = (uint8_t *)pgm_read_ptr(&font[active_anim->data[str_pos]]);
+				glyph_len = pgm_read_byte(&glyph_addr[0]);
+				char_pos++;
 
-			if (char_pos > glyph_len) {
-				char_pos = 0;
-				str_pos++;
-			}
+				if (char_pos > glyph_len) {
+					char_pos = 0;
+					str_pos++;
+				}
 
-			if (char_pos == 0) {
-				disp_buf[7] = 0xff; // whitespace
-			} else {
-				disp_buf[7] = ~pgm_read_byte(&glyph_addr[char_pos]);
+				if (char_pos == 0) {
+					disp_buf[7] = 0xff; // whitespace
+				} else {
+					disp_buf[7] = ~pgm_read_byte(&glyph_addr[char_pos]);
+				}
+			} else if (active_anim->type == AnimationType::FRAMES) {
+				for (i = 0; i < 8; i++) {
+					disp_buf[i] = ~active_anim->data[str_pos+i];
+				}
+				str_pos += 8;
 			}
-		} else if (active_anim->type == AnimationType::FRAMES) {
-			for (i = 0; i < 8; i++) {
-				disp_buf[i] = ~active_anim->data[str_pos+i];
+			if (str_pos >= active_anim->length) {
+				str_pos = 0;
+				if (active_anim->delay > 0) {
+					status = PAUSED;
+				}
 			}
-			str_pos += 8;
-		}
-		if (str_pos >= active_anim->length) {
-			str_pos = 0;
+		} else if (status == PAUSED) {
+			str_pos++;
+			if (str_pos >= active_anim->delay) {
+				str_pos = 0;
+				status = RUNNING;
+			}
 		}
 	}
 }
@@ -95,6 +106,7 @@ void Display::reset()
 		disp_buf[i] = 0xff;
 	str_pos = 0;
 	char_pos = -1;
+	status = RUNNING;
 }
 
 void Display::show(animation_t *anim)

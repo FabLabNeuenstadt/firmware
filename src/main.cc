@@ -12,16 +12,18 @@ int main (void)
 {
 	ohai.type = AnimationType::TEXT;
 	ohai.speed = (2 << 4) + 15;
-	ohai.data = (uint8_t *)"\001 Ohai  ";
+	ohai.data = (uint8_t *)" Ohai  \001";
 	ohai.length = 8;
+	ohai.delay = (0 << 4) + 0; // -> 4bit 0 remains 0
 
-	uint8_t anim_data[] = { 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0, 0, 0, 0, 0, 0, 0, 0 };
+	uint8_t anim_data[] = { 0x80, 0x40, 0x20, 0x10, 0x08, 0x04, 0x02, 0x01, 0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80 };
 
 	animation_t test;
 	test.type = AnimationType::FRAMES;
 	test.speed = 14;
 	test.length = 2*8;
 	test.data = anim_data;
+	test.delay = (1 << 4);
 
 	rocket.initialize();
 

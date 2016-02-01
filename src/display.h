@@ -66,6 +66,15 @@ class Display {
 		uint8_t disp_buf[8];
 		uint8_t str_pos;
 		int8_t char_pos;
+
+		enum AnimationStatus : uint8_t {
+			RUNNING,
+			SCROLL_BACK,
+			PAUSED
+		};
+
+		AnimationStatus status;
+
 	public:
 		Display();
 
