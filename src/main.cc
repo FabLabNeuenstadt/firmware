@@ -10,7 +10,7 @@ animation_t ohai;
 
 int main (void)
 {
-	ohai.mode = AnimationType::TEXT;
+	ohai.type = AnimationType::TEXT;
 	ohai.speed = (2 << 4) + 15;
 	ohai.data = (uint8_t *)"\001 Ohai  ";
 	ohai.length = 8;
@@ -18,7 +18,7 @@ int main (void)
 	uint8_t anim_data[] = { 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0, 0, 0, 0, 0, 0, 0, 0 };
 
 	animation_t test;
-	test.mode = AnimationType::FRAMES;
+	test.type = AnimationType::FRAMES;
 	test.speed = 14;
 	test.length = 2*8;
 	test.data = anim_data;

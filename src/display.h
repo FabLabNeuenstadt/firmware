@@ -19,7 +19,7 @@ struct animation {
 	 * Specific kind of animation described in this struct. Controls the
 	 * behaviour of Display::multiplex() and Display::update().
 	 */
-	AnimationType mode;
+	AnimationType type;
 
 	/**
 	 * Length of data in bytes
@@ -27,8 +27,8 @@ struct animation {
 	uint8_t length;
 
 	/**
-	 * * If mode == AnimationType::TEXT: Text scroll speed in columns per TODO
-	 * * If mode == FRAMES: Frames per TODO
+	 * * If type == AnimationType::TEXT: Text scroll speed in columns per TODO
+	 * * If type == AnimationType::FRAMES: Frames per TODO
 	 */
 	uint8_t speed;
 
@@ -43,9 +43,9 @@ struct animation {
 	uint8_t direction;
 
 	/**
-	 * * If mode == AnimationType::TEXT: character array pointing to the
+	 * * If type == AnimationType::TEXT: character array pointing to the
 	 *   animation text in standard ASCII format (+ special font chars)
-	 * * If mode == FRAMES: Frame array. Each element encodes
+	 * * If type == AnimationType::FRAMES: Frame array. Each element encodes
 	 *   a display column (starting with the leftmost one), each group of
 	 *   eight elements is a frame.
 	 */

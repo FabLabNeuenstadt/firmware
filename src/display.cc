@@ -58,7 +58,7 @@ void Display::update() {
 	if (need_update) {
 		need_update = 0;
 
-		if (active_anim->mode == AnimationType::TEXT) {
+		if (active_anim->type == AnimationType::TEXT) {
 			for (i = 0; i < 7; i++) {
 				disp_buf[i] = disp_buf[i+1];
 			}
@@ -77,7 +77,7 @@ void Display::update() {
 			} else {
 				disp_buf[7] = ~pgm_read_byte(&glyph_addr[char_pos]);
 			}
-		} else if (active_anim->mode == AnimationType::FRAMES) {
+		} else if (active_anim->type == AnimationType::FRAMES) {
 			for (i = 0; i < 8; i++) {
 				disp_buf[i] = ~active_anim->data[str_pos+i];
 			}
