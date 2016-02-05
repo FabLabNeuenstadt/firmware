@@ -57,9 +57,9 @@ program: build/main.hex #main.eep
 	${AVRFLASH} -p ${MCU} -c ${AVRDUDE_PROGRAMMER} ${AVRFLAGS}
 
 secsize: build/main.elf
-	${AVROBJDUMP} -hw -j.text -j.bss -j.data main.elf
+	${AVROBJDUMP} -hw -j.text -j.bss -j.data $<
 
 funsize: build/main.elf
-	${AVRNM} --print-size --size-sort main.elf
+	${AVRNM} --print-size --size-sort $<
 
 .PHONY: all program secsize funsize
