@@ -10,8 +10,9 @@
 #include <avr/io.h>
 #include <stdlib.h>
 #include "modem.h"
+#include "fecmodem.h"
 
-Modem modem;
+extern FECModem modem;
 
 /*
  * Returns number of available bytes in ringbuffer or 0 if empty
@@ -24,7 +25,7 @@ uint8_t Modem::buffer_available() {
  * Store 1 byte in ringbuffer
  */
 inline void Modem::buffer_put(const uint8_t c) {
-	if (modem.buffer_available() != MODEM_BUFFER_SIZE) {
+	if (buffer_available() != MODEM_BUFFER_SIZE) {
 		buffer[buffer_head++ % MODEM_BUFFER_SIZE] = c;
 	}
 }

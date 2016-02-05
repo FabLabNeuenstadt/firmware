@@ -3,7 +3,7 @@
 #include "display.h"
 #include "font.h"
 #include "storage.h"
-#include "modem.h"
+#include "fecmodem.h"
 #include "system.h"
 
 animation_t ohai;

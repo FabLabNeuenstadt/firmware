@@ -5,7 +5,7 @@
 #include <stdlib.h>
 
 #include "display.h"
-#include "modem.h"
+#include "fecmodem.h"
 #include "storage.h"
 #include "system.h"
 

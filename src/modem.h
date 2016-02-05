@@ -70,6 +70,4 @@ class Modem {
 		void receive(void);
 };
 
-extern Modem modem;
-
 #endif /* MODEM_H_ */
