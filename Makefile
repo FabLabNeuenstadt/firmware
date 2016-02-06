@@ -53,6 +53,8 @@ build/main.elf: ${OBJECTS}
 	@echo
 	@avr-size --format=avr --mcu=${MCU} $@
 
+flash: program
+
 program: build/main.hex #main.eep
 	${AVRFLASH} -p ${MCU} -c ${AVRDUDE_PROGRAMMER} ${AVRFLAGS}
 
