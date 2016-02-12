@@ -77,7 +77,7 @@ class modem:
 			tmpdata = []
 			# for uneven length data, we have to append a null byte
 			if not len(self.data) % 2 == 0:
-				self.data.append('0x00')
+				self.data.append(chr(0))
 			# insert the parity information every two bytes, sorry for the heavy casting
 			for index in range(0, len(self.data), 2):
 				tmpdata.extend(self.data[index:index+2])
@@ -199,7 +199,7 @@ class blinkenrocket():
 
 
 if __name__ == '__main__':
-	m = modem(parity=False)
+	m = modem(parity=True)
 	#print list(open(sys.argv[1]).read())
 	m.setData(list(open(sys.argv[1]).read()))
 	m.saveAudio(sys.argv[2])
