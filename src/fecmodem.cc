@@ -48,4 +48,32 @@ uint8_t FECModem::hamming2416(uint8_t *byte1, uint8_t *byte2, uint8_t parity)
 	return 0;
 }
 
+uint8_t FECModem::buffer_available()
+{
+	if (rxWasReset())
+		hammingState = FIRST_BYTE;
+	if (this->Modem::buffer_available() >= 3)
+		return 2;
+	if (hammingState == SECOND_BYTE)
+		return 1;
+	return 0;
+}
+
+uint8_t FECModem::buffer_get()
+{
+	uint8_t byte1, parity;
+	if (hammingState == SECOND_BYTE) {
+		hammingState = FIRST_BYTE;
+		return buf_byte;
+	}
+	hammingState = SECOND_BYTE;
+	byte1 = this->Modem::buffer_get();
+	buf_byte = this->Modem::buffer_get();
+	parity = this->Modem::buffer_get();
+
+	hamming2416(&byte1, &buf_byte, parity);
+
+	return byte1;
+}
+
 FECModem modem;

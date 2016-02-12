@@ -32,9 +32,12 @@ class Modem {
 		uint8_t buffer_head;
 		uint8_t buffer_tail;
 		uint8_t buffer[MODEM_BUFFER_SIZE];
+		bool new_transmission;
 		void buffer_put(const uint8_t c);
 	public:
-		Modem() {};
+		Modem() {new_transmission = false;};
+
+		bool rxWasReset();
 
 		/**
 		 * Checks if there are unprocessed bytes in the modem receive buffer.

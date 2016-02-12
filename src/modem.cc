@@ -14,6 +14,15 @@
 
 extern FECModem modem;
 
+bool Modem::rxWasReset()
+{
+	if (new_transmission) {
+		new_transmission = false;
+		return true;
+	}
+	return false;
+}
+
 /*
  * Returns number of available bytes in ringbuffer or 0 if empty
  */
@@ -84,6 +93,7 @@ void Modem::receive() {
 	if (modem_pulselen > MODEM_SYNC_LEN) {
 		modem_bitlen = (modem_pulselen >> 2);
 		modem_bit = 0;
+		new_transmission = true;
 		return;
 	}
 
