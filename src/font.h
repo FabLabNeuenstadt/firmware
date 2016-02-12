@@ -133,7 +133,7 @@ const unsigned char PROGMEM chr_125[] = {0x03,0x41,0x36,0x08}; // }
 const unsigned char PROGMEM chr_126[] = {0x05,0x08,0x10,0x08,0x04,0x08}; // ~
 
 const glyph_t font[] PROGMEM = {
-	chr_001,
+	chr_002, // special character for uncorrectable byte errors
 	chr_001,
 	chr_002,
 	chr_003,

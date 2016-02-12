@@ -17,14 +17,16 @@ uint8_t FECModem::correct128(uint8_t *byte, uint8_t err)
 	uint8_t result = pgm_read_byte(&hammingParityCheck[err & 0x0f]);
 
 	if (result != NO_ERROR) {
-		if (result == UNCORRECTABLE || byte == NULL) {
+		if (byte == NULL)
 			return 3;
-		} else {
-			if (result != ERROR_IN_PARITY) {
-				*byte ^= result;
-			}
-			return 1;
+		if (result == UNCORRECTABLE) {
+			*byte = 0;
+			return 3;
 		}
+		if (result != ERROR_IN_PARITY) {
+			*byte ^= result;
+		}
+		return 1;
 	}
 	return 0;
 }
