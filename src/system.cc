@@ -67,9 +67,11 @@ void System::loop()
 		if (i == 127) {
 			i = 0;
 		} else if (modem_byte == 0) {
-			ohai.data = disp_buf;
-			ohai.length = i-1;
-			display.show(&ohai);
+			if (i > 1) { // workaround for trailing double null bytes
+				ohai.data = disp_buf;
+				ohai.length = i-1;
+				display.show(&ohai);
+			}
 			i = 0;
 		}
 	}
