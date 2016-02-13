@@ -37,7 +37,7 @@ class Modem {
 	public:
 		Modem() {new_transmission = false;};
 
-		bool rxWasReset();
+		bool newTransmission();
 
 		/**
 		 * Checks if there are unprocessed bytes in the modem receive buffer.

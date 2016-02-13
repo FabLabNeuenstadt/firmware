@@ -14,7 +14,7 @@
 
 extern FECModem modem;
 
-bool Modem::rxWasReset()
+bool Modem::newTransmission()
 {
 	if (new_transmission) {
 		new_transmission = false;
