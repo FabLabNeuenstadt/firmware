@@ -25,7 +25,7 @@
 /**
  * Receive-only modem. Sets up a pin change interrupt on the modem pin
  * and receives bytes using a simple protocol. Does not detect or correct
- * transmission errors. Exposes a global modem object for convenience.
+ * transmission errors.
  */
 class Modem {
 	private:
@@ -37,6 +37,12 @@ class Modem {
 	public:
 		Modem() {new_transmission = false;};
 
+		/**
+		 * Checks if a new transmission was started since the last call
+		 * to this function. Returns true if that is the case and false
+		 * otherwise.
+		 * @return true if a new transmission was started
+		 */
 		bool newTransmission();
 
 		/**

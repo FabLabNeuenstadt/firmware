@@ -7,6 +7,12 @@
 #include "hamming.h"
 #include "modem.h"
 
+/**
+ * Receive-only modem with forward error correction.
+ * Uses the Modem class to read raw modem data and uses the Hamming 2416
+ * algorithm to detect and, if possible, correct transmission errors.
+ * Exposes a global modem object for convenience.
+ */
 class FECModem : public Modem {
 	private:
 		enum HammingState : uint8_t {
@@ -22,7 +28,21 @@ class FECModem : public Modem {
 		uint8_t hamming2416(uint8_t *byte1, uint8_t *byte2, uint8_t parity);
 	public:
 		FECModem() : Modem() { hammingState = FIRST_BYTE; };
+
+		/**
+		 * Checks if there are unprocessed bytes in the receive buffer.
+		 * Parity bytes are accounted for, so if three raw bytes (two data,
+		 * one parity) were received by Modem::receive(), this function will
+		 * return 2.
+		 * @return number of unprocessed data bytes
+		 */
 		uint8_t buffer_available(void);
+
+		/**
+		 * Get next byte from the receive buffer.
+		 * @return received byte (0 if it contained uncorrectable errors
+		 *         or the buffer is empty)
+		 */
 		uint8_t buffer_get(void);
 };
 
