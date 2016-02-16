@@ -12,7 +12,7 @@ MCU_FLAGS = -mmcu=attiny88 -DF_CPU=8000000UL
 
 SHARED_FLAGS = ${MCU_FLAGS} -I. -Os -Wall -Wextra -pedantic
 SHARED_FLAGS += -funsigned-char -funsigned-bitfields -fpack-struct -fshort-enums
-SHARED_FLAGS += -fwhole-program -flto -mstrict-X
+SHARED_FLAGS += -flto -mstrict-X
 
 CFLAGS += ${SHARED_FLAGS} -std=c11
 CXXFLAGS += ${SHARED_FLAGS} -std=c++11 -fno-rtti -fno-exceptions
