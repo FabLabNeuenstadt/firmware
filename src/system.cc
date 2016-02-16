@@ -42,6 +42,13 @@ void System::receive(void)
 	static uint16_t remaining_bytes = 0;
 	uint8_t rx_byte = modem.buffer_get();
 
+	/*
+	 * START* and PATTERN* are sync signals, everything else needs to be
+	 * stored on the EEPROM.
+	 * (Note that the C++ standard guarantees "rxExpect > PATTERN2" to match
+	 * for HEADER*, META* and DATA since they are located after PATTERN2
+	 * in the RxExpect enum declaration)
+	 */
 	if (rxExpect > PATTERN2) {
 		rx_buf[rx_pos] = modem.buffer_get();
 	}

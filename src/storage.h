@@ -16,12 +16,50 @@ class Storage {
 		// TODO "file system" housekeeping (index of first free page)
 	public:
 		Storage() { num_anims = 0xff; first_free_page = 0;};
+
+		/**
+		 * Enable the storage hardware: Configures the internal I2C
+		 * module and reads the number of stored animations from the
+		 * EEPROM.
+		 */
 		void enable();
+
+		/**
+		 * Prepares the storage for a complete overwrite by setting the
+		 * number of stored animations to zero. The next save operation
+		 * will get pattern id 0 and overwrite the first stored pattern.
+		 *
+		 * This function itself does not write anything to the EEPROM.
+		 */
 		void reset();
+
+		/**
+		 * Load pattern from EEPROM.
+		 *
+		 * @param idx pattern index
+		 * @param data pointer to data structure for the pattern. Must be
+		 *        at least 256 Bytes
+		 */
 		void load(uint16_t idx, uint8_t *data);
-		void save(uint16_t idx, uint8_t *data);
+
+		/**
+		 * Save (possibly partial) pattern on the EEPROM. 64 bytes of
+		 * dattern data will be read and stored, regardless of the
+		 * pattern header.
+		 *
+		 * @param idx pattern index (subjec to change!)
+		 * @param data pattern data. Must be at least 64 Bytes
+		 */
+		void save(uint16_t idx, uint8_t *data); // TODO probably better without idx
+
+		/**
+		 * Continue saving a pattern on the EEPROM. Appends 64 bytes of
+		 * pattern data after the most recently written block of data
+		 * (i.e., to the pattern which is currently being saved).
+		 *
+		 * @param data pattern data. Must be at least 64 Bytes
+		 */
 		void append(uint8_t *data);
-		// TODO load / save methods for animations
 };
 
 extern Storage storage;
