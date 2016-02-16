@@ -46,6 +46,8 @@ void Storage::enable()
 	 */
 	TWSR = 0; // the lower two bits control TWPS
 	TWBR = ((F_CPU / 100000UL) - 16) / 2;
+
+	i2c_read(0, 1, &num_anims);
 }
 
 
@@ -167,4 +169,36 @@ int8_t Storage::i2c_read(uint16_t pos, uint8_t len, uint8_t *data)
 	i2c_stop();
 
 	return 0; // TODO proper return code to indicate read/write errors
+}
+
+void Storage::reset()
+{
+	uint8_t data = 0;
+	i2c_write(0, 1, &data);
+	first_free_page = 0;
+}
+
+void Storage::load(uint16_t idx, uint8_t *data)
+{
+	uint8_t page_offset;
+	uint8_t header[2];
+	i2c_read(1 + idx, 1, &page_offset);
+
+	i2c_read(256 + (64 * (uint16_t)page_offset), 2, header);
+	i2c_read(256 + (64 * (uint16_t)page_offset) + 2, (header[0] << 4) + (header[1] >> 4), data);
+}
+
+void Storage::save(uint16_t idx, uint8_t *data)
+{
+	i2c_write(1 + idx, 1, &first_free_page);
+	append(data);
+}
+
+void Storage::append(uint8_t *data)
+{
+	// the header indicates the length of the data, but we really don't care
+	// - it's easier to just write the whole page and skip the trailing
+	// garbage when reading.
+	i2c_write(256 + (64 * (uint16_t)first_free_page), 64, data);
+	first_free_page++;
 }

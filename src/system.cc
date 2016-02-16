@@ -16,6 +16,7 @@ System rocket;
 extern animation_t ohai;
 
 uint8_t disp_buf[128];
+uint8_t *rx_buf = disp_buf + 64;
 
 void System::initialize()
 {
@@ -35,10 +36,65 @@ void System::initialize()
 	sei();
 }
 
+void System::receive(void)
+{
+	static uint8_t rx_pos = 0;
+	static uint16_t remaining_bytes = 0;
+	uint8_t rx_byte = modem.buffer_get();
+
+	if (rxExpect > PATTERN2) {
+		rx_buf[rx_pos] = modem.buffer_get();
+	}
+
+	switch(rxExpect) {
+		case START1:
+			if (rx_byte == 0x99)
+				rxExpect = START2;
+			break;
+		case START2:
+			if (rx_byte == 0x99)
+				rxExpect = PATTERN1;
+			break;
+		case PATTERN1:
+			if (rx_byte == 0xa9)
+				rxExpect = PATTERN2;
+			break;
+		case PATTERN2:
+			if (rx_byte == 0xa9)
+				rxExpect = HEADER1;
+			break;
+		case HEADER1:
+			rxExpect = HEADER2;
+			break;
+		case HEADER2:
+			rxExpect = META1;
+			break;
+		case META1:
+			rxExpect = META2;
+			break;
+		case META2:
+			rxExpect = DATA;
+			break;
+		case DATA:
+			break;
+	}
+
+	/*
+	if (i == 127) {
+		i = 0;
+	} else if (modem_byte == 0) {
+		if (i > 1) { // workaround for trailing double null bytes
+			ohai.data = disp_buf;
+			ohai.length = i-1;
+			display.show(&ohai);
+		}
+		i = 0;
+	}
+	*/
+}
+
 void System::loop()
 {
-	static uint8_t i = 0;
-	uint8_t modem_byte;
 	// both buttons are pressed
 	if ((PINC & (_BV(PC3) | _BV(PC7))) == 0) {
 		// naptime!
@@ -62,18 +118,7 @@ void System::loop()
 	}
 
 	while (modem.buffer_available()) {
-		modem_byte = modem.buffer_get();
-		disp_buf[i++] = modem_byte;
-		if (i == 127) {
-			i = 0;
-		} else if (modem_byte == 0) {
-			if (i > 1) { // workaround for trailing double null bytes
-				ohai.data = disp_buf;
-				ohai.length = i-1;
-				display.show(&ohai);
-			}
-			i = 0;
-		}
+		receive();
 	}
 
 	display.update();

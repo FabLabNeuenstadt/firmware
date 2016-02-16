@@ -4,6 +4,8 @@
 
 class Storage {
 	private:
+		uint8_t num_anims;
+		uint8_t first_free_page;
 		void i2c_start_write(void);
 		void i2c_start_read(void);
 		void i2c_stop(void);
@@ -13,8 +15,12 @@ class Storage {
 		int8_t i2c_write(uint16_t addr, uint8_t len, uint8_t *data);
 		// TODO "file system" housekeeping (index of first free page)
 	public:
-		Storage() {};
+		Storage() { num_anims = 0xff; first_free_page = 0;};
 		void enable();
+		void reset();
+		void load(uint16_t idx, uint8_t *data);
+		void save(uint16_t idx, uint8_t *data);
+		void append(uint8_t *data);
 		// TODO load / save methods for animations
 };
 

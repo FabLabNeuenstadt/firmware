@@ -10,8 +10,24 @@ class System {
 	private:
 		uint16_t want_shutdown;
 		void shutdown(void);
+		void receive(void);
+
+		enum RxExpect : uint8_t {
+			START1,
+			START2,
+			PATTERN1,
+			PATTERN2,
+			HEADER1,
+			HEADER2,
+			META1,
+			META2,
+			DATA
+		};
+
+		RxExpect rxExpect;
+
 	public:
-		System() { want_shutdown = 0; };
+		System() { want_shutdown = 0; rxExpect = START1; };
 
 		/**
 		 * Initial MCU setup. Turns off unused peripherals to save power
