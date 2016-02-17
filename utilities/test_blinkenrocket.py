@@ -105,11 +105,12 @@ class TestBlinkenrocket(unittest.TestCase):
 
   def test_addFrameText(self):
     text = textFrame("MUZY",speed=7,delay=8,direction=1)
+    self.assertEquals(text.getFrameHeader(),[chr(0x01 << 4), chr(4)])
     self.assertEquals(text.getHeader(),[chr(7 << 4 | 8),chr(1 << 4 | 0)])
-    self.assertEquals(text.getRepresentation(),[chr(7 << 4 | 8),chr(1 << 4 | 0),'M','U','Z','Y'])
+    self.assertEquals(text.getRepresentation(),[chr(0x01 << 4), chr(4),chr(7 << 4 | 8),chr(1 << 4 | 0),'M','U','Z','Y'])
     br = blinkenrocket()
     br.addFrame(text)
-    expect = [chr(0x99),chr(0x99),chr(0xA9),chr(0xA9),chr(7 << 4 | 8),chr(1 << 4 | 0),'M','U','Z','Y']
+    expect = [chr(0x99),chr(0x99),chr(0xA9),chr(0xA9),chr(0x01 << 4), chr(4),chr(7 << 4 | 8),chr(1 << 4 | 0),'M','U','Z','Y']
     self.assertEquals(br.getMessage(),expect)
 
 if __name__ == '__main__':

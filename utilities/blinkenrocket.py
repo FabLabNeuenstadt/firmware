@@ -104,15 +104,21 @@ class modem:
 		wav.close()
 
 class Frame( object ):
-    """ Returns the representation """
-    def getRepresentation( self ):
-        raise NotImplementedError( "Should have implemented this" )
+	""" Returns the frame information """
+	def getFrameHeader(self):
+		raise NotImplementedError("You should implement this!")
+
+	""" Returns the representation """
+	def getRepresentation(self):
+		raise NotImplementedError("Should have implemented this")
 
 class textFrame(Frame):
 	text = ""
 	speed = 0
 	delay = 0
 	direction = 0
+	# identifier as of message specification: 0001
+	identifier = 0x01
 
 	def __init__(self,text,speed=1,delay=0,direction=0):
 		self.text = text
@@ -129,12 +135,17 @@ class textFrame(Frame):
 	def setDirection(self,direction):
 		self.direction = direction if direction in [0,1] else 0
 
+	# Frame header: 4 bit type + 12 bit length
+	def getFrameHeader(self):
+		return [chr(self.identifier << 4 | len(self.text) >> 8), chr(len(self.text) & 0xFF) ]
+
 	# Header -> 4bit speed, 4 bit delay, 4 bit direction, 4 bit zero
 	def getHeader(self):
 		return [chr(self.speed << 4 | self.delay), chr(self.direction << 4 | 0x00)]
 
 	def getRepresentation(self):
 		retval = []
+		retval.extend(self.getFrameHeader())
 		retval.extend(self.getHeader())
 		retval.extend(list(self.text))
 		return retval
@@ -143,6 +154,8 @@ class animationFrame(Frame):
 	animation = []
 	speed = 0
 	delay = 0
+	# identifier as per specification: 0010	
+	identifier = 0x02
 
 	def __init__(self,animation,speed=1,delay=0):
 		self.setAnimation(animation)
@@ -161,12 +174,17 @@ class animationFrame(Frame):
 	def setDelay(self,delay):
 		self.delay = delay if delay < 16 else 0
 
+	# Frame header: 4 bit type + 12 bit length
+	def getFrameHeader(self):
+		return [chr(self.identifier << 4 | len(self.animation) >> 8), chr(len(self.animation) & 0xFF) ]
+
 	# Header -> 4bit zero, 4bit speed, 4 bit zero, 4 bit direction
 	def getHeader(self):
 		return [chr(self.speed), chr(self.delay)]
 
 	def getRepresentation(self):
 		retval = []
+		retval.extend(self.getFrameHeader())
 		retval.extend(self.getHeader())
 		retval.extend(self.animation)
 		return retval
