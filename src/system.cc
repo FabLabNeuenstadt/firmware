@@ -60,8 +60,10 @@ void System::receive(void)
 				rxExpect = START2;
 			break;
 		case START2:
-			if (rx_byte == 0x99)
+			if (rx_byte == 0x99) {
 				rxExpect = PATTERN1;
+				storage.reset();
+			}
 			break;
 		case PATTERN1:
 			if (rx_byte == 0xa9)
