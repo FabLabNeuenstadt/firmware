@@ -47,10 +47,9 @@ class Storage {
 		 * dattern data will be read and stored, regardless of the
 		 * pattern header.
 		 *
-		 * @param idx pattern index (subjec to change!)
 		 * @param data pattern data. Must be at least 64 Bytes
 		 */
-		void save(uint16_t idx, uint8_t *data); // TODO probably better without idx
+		void save(uint8_t *data);
 
 		/**
 		 * Continue saving a pattern on the EEPROM. Appends 64 bytes of

@@ -173,9 +173,9 @@ int8_t Storage::i2c_read(uint16_t pos, uint8_t len, uint8_t *data)
 
 void Storage::reset()
 {
-	uint8_t data = 0;
-	i2c_write(0, 1, &data);
 	first_free_page = 0;
+	num_anims = 0;
+	i2c_write(0, 1, &num_anims);
 }
 
 void Storage::load(uint16_t idx, uint8_t *data)
@@ -188,9 +188,11 @@ void Storage::load(uint16_t idx, uint8_t *data)
 	i2c_read(256 + (64 * (uint16_t)page_offset) + 2, (header[0] << 4) + (header[1] >> 4), data);
 }
 
-void Storage::save(uint16_t idx, uint8_t *data)
+void Storage::save(uint8_t *data)
 {
-	i2c_write(1 + idx, 1, &first_free_page);
+	num_anims++;
+	i2c_write(0, 1, &num_anims);
+	i2c_write(num_anims, 1, &first_free_page);
 	append(data);
 }
 

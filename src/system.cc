@@ -36,6 +36,7 @@ void System::initialize()
 	sei();
 }
 
+// ! This function has not been tested yet
 void System::receive(void)
 {
 	static uint8_t rx_pos = 0;
@@ -72,17 +73,39 @@ void System::receive(void)
 			break;
 		case HEADER1:
 			rxExpect = HEADER2;
+			rx_pos = 0;
+			remaining_bytes = (rx_byte & 0x0f) << 8;
 			break;
 		case HEADER2:
 			rxExpect = META1;
+			remaining_bytes += rx_byte;
 			break;
 		case META1:
 			rxExpect = META2;
 			break;
 		case META2:
-			rxExpect = DATA;
+			rxExpect = DATA_FIRSTBLOCK;
+			break;
+		case DATA_FIRSTBLOCK:
+			remaining_bytes--;
+			if (remaining_bytes == 0) {
+				rxExpect = PATTERN1; // TODO or new START1
+				storage.save(rx_buf);
+			} else if (rx_pos == 64) {
+				rxExpect = DATA;
+				rx_pos = 0;
+				storage.save(rx_buf);
+			}
 			break;
 		case DATA:
+			remaining_bytes--;
+			if (remaining_bytes == 0) {
+				rxExpect = PATTERN1; // TODO or new START1
+				storage.append(rx_buf);
+			} else if (rx_pos == 64) {
+				rx_pos = 0;
+				storage.append(rx_buf);
+			}
 			break;
 	}
 

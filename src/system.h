@@ -21,7 +21,8 @@ class System {
 			HEADER2,
 			META1,
 			META2,
-			DATA
+			DATA_FIRSTBLOCK,
+			DATA,
 		};
 
 		RxExpect rxExpect;
