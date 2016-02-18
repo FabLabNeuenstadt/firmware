@@ -13,9 +13,8 @@ class Storage {
 		int8_t i2c_receive(uint8_t len, uint8_t *data);
 		int8_t i2c_read(uint16_t addr, uint8_t len, uint8_t *data);
 		int8_t i2c_write(uint16_t addr, uint8_t len, uint8_t *data);
-		// TODO "file system" housekeeping (index of first free page)
 	public:
-		Storage() { num_anims = 0xff; first_free_page = 0;};
+		Storage() { num_anims = 0; first_free_page = 0;};
 
 		/**
 		 * Enable the storage hardware: Configures the internal I2C

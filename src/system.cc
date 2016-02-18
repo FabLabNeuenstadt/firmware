@@ -65,6 +65,12 @@ void System::receive(void)
 				storage.reset();
 			}
 			break;
+		case START_OR_PATTERN:
+			if (rx_byte == 0x99)
+				rxExpect = START2;
+			else if (rx_byte == 0xa9)
+				rxExpect = PATTERN2;
+			break;
 		case PATTERN1:
 			if (rx_byte == 0xa9)
 				rxExpect = PATTERN2;
@@ -91,7 +97,7 @@ void System::receive(void)
 		case DATA_FIRSTBLOCK:
 			remaining_bytes--;
 			if (remaining_bytes == 0) {
-				rxExpect = PATTERN1; // TODO or new START1
+				rxExpect = START_OR_PATTERN;
 				storage.save(rx_buf);
 			} else if (rx_pos == 64) {
 				rxExpect = DATA;
@@ -102,7 +108,7 @@ void System::receive(void)
 		case DATA:
 			remaining_bytes--;
 			if (remaining_bytes == 0) {
-				rxExpect = PATTERN1; // TODO or new START1
+				rxExpect = START_OR_PATTERN;
 				storage.append(rx_buf);
 			} else if (rx_pos == 64) {
 				rx_pos = 0;
