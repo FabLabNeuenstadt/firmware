@@ -58,11 +58,15 @@ void System::receive(void)
 		case START1:
 			if (rx_byte == 0x99)
 				rxExpect = START2;
+			else
+				rxExpect = START_OR_PATTERN;
 			break;
 		case START2:
 			if (rx_byte == 0x99) {
 				rxExpect = PATTERN1;
 				storage.reset();
+			} else {
+				rxExpect = START_OR_PATTERN;
 			}
 			break;
 		case START_OR_PATTERN:
@@ -70,14 +74,20 @@ void System::receive(void)
 				rxExpect = START2;
 			else if (rx_byte == 0xa9)
 				rxExpect = PATTERN2;
+			else
+				rxExpect = START_OR_PATTERN;
 			break;
 		case PATTERN1:
 			if (rx_byte == 0xa9)
 				rxExpect = PATTERN2;
+			else
+				rxExpect = START_OR_PATTERN;
 			break;
 		case PATTERN2:
 			if (rx_byte == 0xa9)
 				rxExpect = HEADER1;
+			else
+				rxExpect = START_OR_PATTERN;
 			break;
 		case HEADER1:
 			rxExpect = HEADER2;
