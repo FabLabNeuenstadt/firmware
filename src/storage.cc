@@ -55,30 +55,42 @@ void Storage::enable()
  * Send an I2C (re)start condition and the EEPROM address in read mode. Returns
  * after it has been transmitted successfully.
  */
-void Storage::i2c_start_read()
+uint8_t Storage::i2c_start_read()
 {
 	TWCR = _BV(TWINT) | _BV(TWSTA) | _BV(TWEN);
 	while (!(TWCR & _BV(TWINT)));
+	if (!(TWSR & 0x18)) // 0x08 == START ok, 0x10 == RESTART ok
+		return I2C_START_ERR;
 
 	// Note: The R byte ("... | 1") causes the TWI momodule to switch to
 	// Master Receive mode
 	TWDR = (I2C_EEPROM_ADDR << 1) | 1;
 	TWCR = _BV(TWINT) | _BV(TWEN);
 	while (!(TWCR & _BV(TWINT)));
+	if (TWSR != 0x40) // 0x40 == SLA+R transmitted, ACK receveid
+		return I2C_ADDR_ERR;
+
+	return I2C_OK;
 }
 
 /*
  * Send an I2C (re)start condition and the EEPROM address in write mode.
  * Returns after it has been transmitted successfully.
  */
-void Storage::i2c_start_write()
+uint8_t Storage::i2c_start_write()
 {
 	TWCR = _BV(TWINT) | _BV(TWSTA) | _BV(TWEN);
 	while (!(TWCR & _BV(TWINT)));
+	if (!(TWSR & 0x18)) // 0x08 == START ok, 0x10 == RESTART ok
+		return I2C_START_ERR;
 
 	TWDR = (I2C_EEPROM_ADDR << 1) | 0;
 	TWCR = _BV(TWINT) | _BV(TWEN);
 	while (!(TWCR & _BV(TWINT)));
+	if (TWSR != 0x18) // 0x18 == SLA+W transmitted, ACK received
+		return I2C_ADDR_ERR;
+
+	return I2C_OK;
 }
 
 /*
@@ -93,8 +105,7 @@ void Storage::i2c_stop()
  * Sends len bytes to the EEPROM. Note that this method does NOT
  * send I2C start or stop conditions.
  */
-// TODO Everything[tm] (error handling and generic code)
-int8_t Storage::i2c_send(uint8_t len, uint8_t *data)
+uint8_t Storage::i2c_send(uint8_t len, uint8_t *data)
 {
 	uint8_t pos = 0;
 
@@ -102,6 +113,8 @@ int8_t Storage::i2c_send(uint8_t len, uint8_t *data)
 		TWDR = data[pos];
 		TWCR = _BV(TWINT) | _BV(TWEN);
 		while (!(TWCR & _BV(TWINT)));
+		if (TWSR != 0x28) // 0x28 == byte transmitted, ACK received
+			return pos;
 	}
 
 	return pos + 1;
@@ -111,8 +124,7 @@ int8_t Storage::i2c_send(uint8_t len, uint8_t *data)
  * Receives len bytes from the EEPROM into data. Note that this method does
  * NOT send I2C start or stop conditions.
  */
-// TODO dito
-int8_t Storage::i2c_receive(uint8_t len, uint8_t *data)
+uint8_t Storage::i2c_receive(uint8_t len, uint8_t *data)
 {
 	uint8_t pos = 0;
 
@@ -136,7 +148,7 @@ int8_t Storage::i2c_receive(uint8_t len, uint8_t *data)
  * Does not check for page boundaries yet.
  * Includes a complete I2C transaction.
  */
-int8_t Storage::i2c_write(uint16_t pos, uint8_t len, uint8_t *data)
+uint8_t Storage::i2c_write(uint16_t pos, uint8_t len, uint8_t *data)
 {
 	uint8_t addr_buf[2];
 
@@ -156,7 +168,7 @@ int8_t Storage::i2c_write(uint16_t pos, uint8_t len, uint8_t *data)
  * Does not check for page boundaries yet.
  * Includes a complete I2C transaction.
  */
-int8_t Storage::i2c_read(uint16_t pos, uint8_t len, uint8_t *data)
+uint8_t Storage::i2c_read(uint16_t pos, uint8_t len, uint8_t *data)
 {
 	uint8_t addr_buf[2];
 	addr_buf[0] = pos >> 8;

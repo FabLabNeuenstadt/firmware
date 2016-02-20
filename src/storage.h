@@ -6,13 +6,20 @@ class Storage {
 	private:
 		uint8_t num_anims;
 		uint8_t first_free_page;
-		void i2c_start_write(void);
-		void i2c_start_read(void);
+		uint8_t i2c_start_write(void);
+		uint8_t i2c_start_read(void);
 		void i2c_stop(void);
-		int8_t i2c_send(uint8_t len, uint8_t *data);
-		int8_t i2c_receive(uint8_t len, uint8_t *data);
-		int8_t i2c_read(uint16_t addr, uint8_t len, uint8_t *data);
-		int8_t i2c_write(uint16_t addr, uint8_t len, uint8_t *data);
+		uint8_t i2c_send(uint8_t len, uint8_t *data);
+		uint8_t i2c_receive(uint8_t len, uint8_t *data);
+		uint8_t i2c_read(uint16_t addr, uint8_t len, uint8_t *data);
+		uint8_t i2c_write(uint16_t addr, uint8_t len, uint8_t *data);
+
+		enum I2CStatus : uint8_t {
+			I2C_OK,
+			I2C_START_ERR,
+			I2C_ADDR_ERR
+		};
+
 	public:
 		Storage() { num_anims = 0; first_free_page = 0;};
 
