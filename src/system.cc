@@ -204,6 +204,9 @@ void System::shutdown()
 
 	// ... and modem
 	modem.enable();
+
+	// also, reset state machine
+	rxExpect = START1;
 }
 
 ISR(PCINT1_vect)
