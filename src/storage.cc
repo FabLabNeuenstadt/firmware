@@ -190,6 +190,14 @@ void Storage::reset()
 	i2c_write(0, 1, &num_anims);
 }
 
+bool Storage::hasData()
+{
+	// Unprogrammed EEPROM pages always read 0xff
+	if (num_anims == 0xff)
+		return false;
+	return true;
+}
+
 void Storage::load(uint16_t idx, uint8_t *data)
 {
 	uint8_t page_offset;

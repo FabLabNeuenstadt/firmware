@@ -40,6 +40,13 @@ class Storage {
 		void reset();
 
 		/**
+		 * Checks whether the EEPROM contains animathion data.
+		 *
+		 * @return true if the EEPROm contains valid-looking data
+		 */
+		bool hasData();
+
+		/**
 		 * Load pattern from EEPROM.
 		 *
 		 * @param idx pattern index
