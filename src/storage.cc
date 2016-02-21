@@ -186,8 +186,9 @@ uint8_t Storage::i2c_read(uint16_t pos, uint8_t len, uint8_t *data)
 void Storage::reset()
 {
 	first_free_page = 0;
+	num_anims = 0xff;
+	i2c_write(0, 1, &num_anims); // pretend the EEPROM was never written to
 	num_anims = 0;
-	i2c_write(0, 1, &num_anims);
 }
 
 bool Storage::hasData()
@@ -205,7 +206,7 @@ void Storage::load(uint16_t idx, uint8_t *data)
 	i2c_read(1 + idx, 1, &page_offset);
 
 	i2c_read(256 + (64 * (uint16_t)page_offset), 2, header);
-	i2c_read(256 + (64 * (uint16_t)page_offset) + 2, (header[0] << 4) + (header[1] >> 4), data);
+	i2c_read(256 + (64 * (uint16_t)page_offset), header[1] + 2, data);
 }
 
 void Storage::save(uint8_t *data)

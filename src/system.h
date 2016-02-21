@@ -9,8 +9,10 @@
 class System {
 	private:
 		uint16_t want_shutdown;
+		uint8_t current_anim_no;
 		void shutdown(void);
 		void receive(void);
+		void loadPattern(uint8_t anim_no);
 
 		enum RxExpect : uint8_t {
 			START1,
@@ -29,7 +31,7 @@ class System {
 		RxExpect rxExpect;
 
 	public:
-		System() { want_shutdown = 0; rxExpect = START1; };
+		System() { want_shutdown = 0; rxExpect = START1; current_anim_no = 0;};
 
 		/**
 		 * Initial MCU setup. Turns off unused peripherals to save power
