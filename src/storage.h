@@ -11,13 +11,14 @@ class Storage {
 		void i2c_stop(void);
 		uint8_t i2c_send(uint8_t len, uint8_t *data);
 		uint8_t i2c_receive(uint8_t len, uint8_t *data);
-		uint8_t i2c_read(uint16_t addr, uint8_t len, uint8_t *data);
-		uint8_t i2c_write(uint16_t addr, uint8_t len, uint8_t *data);
+		uint8_t i2c_read(uint8_t addrhi, uint8_t addrlo, uint8_t len, uint8_t *data);
+		uint8_t i2c_write(uint8_t addrhi, uint8_t addrlo, uint8_t len, uint8_t *data);
 
 		enum I2CStatus : uint8_t {
 			I2C_OK,
 			I2C_START_ERR,
-			I2C_ADDR_ERR
+			I2C_ADDR_ERR,
+			I2C_ERR
 		};
 
 	public:
@@ -53,7 +54,7 @@ class Storage {
 		 * @param data pointer to data structure for the pattern. Must be
 		 *        at least 256 Bytes
 		 */
-		void load(uint16_t idx, uint8_t *data);
+		void load(uint8_t idx, uint8_t *data);
 
 		/**
 		 * Save (possibly partial) pattern on the EEPROM. 64 bytes of

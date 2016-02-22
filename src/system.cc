@@ -16,7 +16,7 @@ System rocket;
 animation_t active_anim;
 
 uint8_t disp_buf[260]; // 4 byte header + 256 byte data
-uint8_t *rx_buf = disp_buf + 64;
+uint8_t *rx_buf = disp_buf + sizeof(disp_buf) - 64;
 
 void System::initialize()
 {
@@ -33,11 +33,15 @@ void System::initialize()
 	modem.enable();
 	storage.enable();
 
+	storage.reset();
+	storage.save((uint8_t *)"\x10\x0a\x11\x00nootnoot");
+	storage.save((uint8_t *)"\x10\x0a\x20\x00nootnoot");
+
 	sei();
 
 	if (storage.hasData()) {
 		current_anim_no = 0;
-		loadPattern(0);
+		loadPattern(1);
 	} else {
 		active_anim.type = AnimationType::TEXT;
 		active_anim.speed = (2 << 4) + 15;
@@ -82,7 +86,7 @@ void System::loadPattern(uint8_t anim_no)
 	storage.load(anim_no, disp_buf);
 
 	active_anim.type = (AnimationType)(disp_buf[0] >> 4);
-	active_anim.length = disp_buf[1];
+	active_anim.length = disp_buf[1] - 2;
 
 	if (active_anim.type == AnimationType::TEXT) {
 		active_anim.speed = (disp_buf[2] & 0xf0) + 15;
@@ -115,6 +119,8 @@ void System::receive(void)
 	if (rxExpect > PATTERN2) {
 		rx_buf[rx_pos] = modem.buffer_get();
 	}
+
+	// TODO adjust for 32 Byte rx buffer size
 
 	switch(rxExpect) {
 		case START1:

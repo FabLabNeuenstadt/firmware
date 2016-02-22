@@ -1,3 +1,4 @@
+#include <util/delay.h>
 #include <avr/io.h>
 #include <stdlib.h>
 
@@ -8,12 +9,12 @@ Storage storage;
 /*
  * EEPROM data structure ("file system"):
  *
- * Organized as 64B-pages, all animations/texts are page-aligned.  Byte 0 ..
+ * Organized as 32B-pages, all animations/texts are page-aligned.  Byte 0 ..
  * 255 : storage metadata. Byte 0 contains the number of animations, byte 1 the
  * page offset of the first animation, byte 2 of the second, and so on.
  * Byte 256+: texts/animations without additional storage metadata, aligned
- * to 64B. So, a maximum of 256-(256/64) = 252 texts/animations can be stored,
- * and a maximum of 255 * 64 = 16320 Bytes (almost 16 kB / 128 kbit) can be
+ * to 32B. So, a maximum of 256-(256/32) = 248 texts/animations can be stored,
+ * and a maximum of 255 * 32 = 8160 Bytes (almost 8 kB / 64 kbit) can be
  * addressed.  To support larger EEPROMS, change the metadate area to Byte 2 ..
  * 511 and use 16bit page pointers.
  *
@@ -21,16 +22,16 @@ Storage storage;
  *
  * Example:
  * Byte     0 = 3 -> we've got a total of three animations
- * Byte     1 = 4 -> first text/animation starts at byte 64*4 = 256
- * Byte     2 = 8 -> second starts at byte 64*8 = 512
- * Byte     3 = 9 -> third starts at 64*9 * 576
+ * Byte     1 = 0 -> first text/animation starts at byte 256 + 32*0 = 256
+ * Byte     2 = 4 -> second starts at byte 256 + 32*4 = 384
+ * Byte     3 = 5 -> third starts at 256 + 32*5 * 416
  * Byte     4 = whatever
  *            .
  *            .
  *            .
  * Byte 256ff = first text/animation. Has a header encoding its length in bytes.
- * Byte 512ff = second
- * Byte 576ff = third
+ * Byte 384ff = second
+ * Byte 416ff = third
  *            .
  *            .
  *            .
@@ -47,7 +48,7 @@ void Storage::enable()
 	TWSR = 0; // the lower two bits control TWPS
 	TWBR = ((F_CPU / 100000UL) - 16) / 2;
 
-	i2c_read(0, 1, &num_anims);
+	i2c_read(0, 0, 1, &num_anims);
 }
 
 
@@ -117,7 +118,7 @@ uint8_t Storage::i2c_send(uint8_t len, uint8_t *data)
 			return pos;
 	}
 
-	return pos + 1;
+	return pos;
 }
 
 /*
@@ -140,7 +141,7 @@ uint8_t Storage::i2c_receive(uint8_t len, uint8_t *data)
 		data[pos] = TWDR;
 	}
 
-	return pos + 1;
+	return pos;
 }
 
 /*
@@ -148,19 +149,33 @@ uint8_t Storage::i2c_receive(uint8_t len, uint8_t *data)
  * Does not check for page boundaries yet.
  * Includes a complete I2C transaction.
  */
-uint8_t Storage::i2c_write(uint16_t pos, uint8_t len, uint8_t *data)
+uint8_t Storage::i2c_write(uint8_t addrhi, uint8_t addrlo, uint8_t len, uint8_t *data)
 {
 	uint8_t addr_buf[2];
+	uint8_t num_tries;
 
-	addr_buf[0] = pos >> 8;
-	addr_buf[1] = pos & 0xff;
+	addr_buf[0] = addrhi;
+	addr_buf[1] = addrlo;
 
-	i2c_start_write();
-	i2c_send(2, addr_buf);
-	i2c_send(len, data);
+	for (num_tries = 0; num_tries < 16; num_tries++) {
+		if (num_tries > 0)
+			_delay_ms(1);
+
+		if (i2c_start_write() != I2C_OK)
+			continue;
+
+		if (i2c_send(2, addr_buf) != 2)
+			continue;
+
+		if (i2c_send(len, data) != len)
+			continue;
+
+		i2c_stop();
+		return I2C_OK;
+	}
+
 	i2c_stop();
-
-	return 0; // TODO proper return code to indicate write errors
+	return I2C_ERR;
 }
 
 /*
@@ -168,26 +183,43 @@ uint8_t Storage::i2c_write(uint16_t pos, uint8_t len, uint8_t *data)
  * Does not check for page boundaries yet.
  * Includes a complete I2C transaction.
  */
-uint8_t Storage::i2c_read(uint16_t pos, uint8_t len, uint8_t *data)
+uint8_t Storage::i2c_read(uint8_t addrhi, uint8_t addrlo, uint8_t len, uint8_t *data)
 {
 	uint8_t addr_buf[2];
-	addr_buf[0] = pos >> 8;
-	addr_buf[1] = pos & 0xff;
+	uint8_t num_tries;
 
-	i2c_start_write();
-	i2c_send(2, addr_buf);
-	i2c_start_read();
-	i2c_receive(len, data);
+	addr_buf[0] = addrhi;
+	addr_buf[1] = addrlo;
+
+	for (num_tries = 0; num_tries < 16; num_tries++) {
+		if (num_tries > 0)
+			_delay_ms(1);
+
+		if (i2c_start_write() != I2C_OK)
+			continue;
+
+		if (i2c_send(2, addr_buf) != 2)
+			continue;
+
+		if (i2c_start_read() != I2C_OK)
+			continue;
+
+		if (i2c_receive(len, data) != len)
+			continue;
+
+		i2c_stop();
+		return I2C_OK;
+	}
+
 	i2c_stop();
-
-	return 0; // TODO proper return code to indicate read/write errors
+	return I2C_ERR;
 }
 
 void Storage::reset()
 {
 	first_free_page = 0;
 	num_anims = 0xff;
-	i2c_write(0, 1, &num_anims); // pretend the EEPROM was never written to
+	i2c_write(0, 0, 1, &num_anims); // pretend the EEPROM was never written to
 	num_anims = 0;
 }
 
@@ -199,21 +231,21 @@ bool Storage::hasData()
 	return true;
 }
 
-void Storage::load(uint16_t idx, uint8_t *data)
+void Storage::load(uint8_t idx, uint8_t *data)
 {
 	uint8_t page_offset;
 	uint8_t header[2];
-	i2c_read(1 + idx, 1, &page_offset);
+	i2c_read(0, 1 + idx, 1, &page_offset);
 
-	i2c_read(256 + (64 * (uint16_t)page_offset), 2, header);
-	i2c_read(256 + (64 * (uint16_t)page_offset), header[1] + 2, data);
+	i2c_read(1 + (page_offset / 8), (page_offset % 8) * 32,  2, header);
+	i2c_read(1 + (page_offset / 8), (page_offset % 8) * 32, header[1] + 2, data);
 }
 
 void Storage::save(uint8_t *data)
 {
 	num_anims++;
-	i2c_write(0, 1, &num_anims);
-	i2c_write(num_anims, 1, &first_free_page);
+	i2c_write(0, 0, 1, &num_anims);
+	i2c_write(0, num_anims, 1, &first_free_page);
 	append(data);
 }
 
@@ -222,6 +254,6 @@ void Storage::append(uint8_t *data)
 	// the header indicates the length of the data, but we really don't care
 	// - it's easier to just write the whole page and skip the trailing
 	// garbage when reading.
-	i2c_write(256 + (64 * (uint16_t)first_free_page), 64, data);
+	i2c_write(1 + (first_free_page / 8), (first_free_page % 8) * 32, 32, data);
 	first_free_page++;
 }
