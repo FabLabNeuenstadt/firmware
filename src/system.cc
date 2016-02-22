@@ -230,6 +230,8 @@ void System::loop()
 		want_shutdown = 0;
 	}
 
+	// TODO refactor the blocks above and below into one
+
 	if ((PINC & _BV(PC3)) == 0) {
 		btnMask = (ButtonMask)(btnMask | BUTTON_RIGHT);
 	}
@@ -296,5 +298,5 @@ void System::shutdown()
 
 ISR(PCINT1_vect)
 {
-	// we use PCINT1 for wakeup, so we should catch it here (and do nothing)
+	// we use PCINT1 for wakeup, so we need an (in this case empty) ISR for it
 }

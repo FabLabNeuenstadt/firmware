@@ -139,6 +139,11 @@ uint8_t Storage::i2c_receive(uint8_t len, uint8_t *data)
 		}
 		while (!(TWCR & _BV(TWINT)));
 		data[pos] = TWDR;
+		/*
+		 * No error handling here -- We send the acks, the EEPROM only
+		 * supplies raw data, so there's no way of knowing whether it's still
+		 * talking to us or we're just reading garbage.
+		 */
 	}
 
 	return pos;
@@ -146,7 +151,7 @@ uint8_t Storage::i2c_receive(uint8_t len, uint8_t *data)
 
 /*
  * Writes len bytes of data into the EEPROM, starting at byte number pos.
- * Does not check for page boundaries yet.
+ * Does not check for page boundaries.
  * Includes a complete I2C transaction.
  */
 uint8_t Storage::i2c_write(uint8_t addrhi, uint8_t addrlo, uint8_t len, uint8_t *data)
@@ -157,18 +162,24 @@ uint8_t Storage::i2c_write(uint8_t addrhi, uint8_t addrlo, uint8_t len, uint8_t 
 	addr_buf[0] = addrhi;
 	addr_buf[1] = addrlo;
 
+	/*
+	 * The EEPROM might be busy processing a write command, which can
+	 * take up to 10ms. Wait up to 16ms to respond before giving up.
+	 * All other error conditions (even though they should never happen[tm])
+	 * are handled the same way.
+	 */
 	for (num_tries = 0; num_tries < 16; num_tries++) {
 		if (num_tries > 0)
 			_delay_ms(1);
 
 		if (i2c_start_write() != I2C_OK)
-			continue;
+			continue; // EEPROM is busy writing
 
 		if (i2c_send(2, addr_buf) != 2)
-			continue;
+			continue; // should not happen
 
 		if (i2c_send(len, data) != len)
-			continue;
+			continue; // should not happen
 
 		i2c_stop();
 		return I2C_OK;
@@ -180,7 +191,7 @@ uint8_t Storage::i2c_write(uint8_t addrhi, uint8_t addrlo, uint8_t len, uint8_t 
 
 /*
  * Reads len bytes of data from the EEPROM, starting at byte number pos.
- * Does not check for page boundaries yet.
+ * Does not check for page boundaries.
  * Includes a complete I2C transaction.
  */
 uint8_t Storage::i2c_read(uint8_t addrhi, uint8_t addrlo, uint8_t len, uint8_t *data)
@@ -191,21 +202,24 @@ uint8_t Storage::i2c_read(uint8_t addrhi, uint8_t addrlo, uint8_t len, uint8_t *
 	addr_buf[0] = addrhi;
 	addr_buf[1] = addrlo;
 
+	/*
+	 * See comments in i2c_write.
+	 */
 	for (num_tries = 0; num_tries < 16; num_tries++) {
 		if (num_tries > 0)
 			_delay_ms(1);
 
 		if (i2c_start_write() != I2C_OK)
-			continue;
+			continue; // EEPROM is busy writing
 
 		if (i2c_send(2, addr_buf) != 2)
-			continue;
+			continue; // should not happen
 
 		if (i2c_start_read() != I2C_OK)
-			continue;
+			continue; // should not happen
 
 		if (i2c_receive(len, data) != len)
-			continue;
+			continue; // should not happen
 
 		i2c_stop();
 		return I2C_OK;

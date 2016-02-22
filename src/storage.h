@@ -26,7 +26,7 @@ class Storage {
 
 		/**
 		 * Enable the storage hardware: Configures the internal I2C
-		 * module and reads the number of stored animations from the
+		 * module and reads the number of stored patterns from the
 		 * EEPROM.
 		 */
 		void enable();
@@ -36,7 +36,9 @@ class Storage {
 		 * number of stored animations to zero. The next save operation
 		 * will get pattern id 0 and overwrite the first stored pattern.
 		 *
-		 * This function itself does not write anything to the EEPROM.
+		 * This function does not delete patterns from the EEPROM. However,
+		 * it does reset the pattern counter, thus making all saved patterns
+		 * unavailable to the load and numPatterns functions.
 		 */
 		void reset();
 
@@ -47,32 +49,38 @@ class Storage {
 		 */
 		bool hasData();
 
+		/**
+		 * Accessor for the number of saved patterns on the EEPROM.
+		 * Only returns valid data if hasData() returned true.
+		 *
+		 * @return number of patterns
+		 */
 		uint8_t numPatterns() { return num_anims; };
 
 		/**
 		 * Load pattern from EEPROM.
 		 *
-		 * @param idx pattern index
+		 * @param idx pattern index (starting with 0)
 		 * @param data pointer to data structure for the pattern. Must be
-		 *        at least 256 Bytes
+		 *        at least 260 bytes
 		 */
 		void load(uint8_t idx, uint8_t *data);
 
 		/**
-		 * Save (possibly partial) pattern on the EEPROM. 64 bytes of
+		 * Save (possibly partial) pattern on the EEPROM. 32 bytes of
 		 * dattern data will be read and stored, regardless of the
 		 * pattern header.
 		 *
-		 * @param data pattern data. Must be at least 64 Bytes
+		 * @param data pattern data. Must be at least 32 bytes
 		 */
 		void save(uint8_t *data);
 
 		/**
-		 * Continue saving a pattern on the EEPROM. Appends 64 bytes of
+		 * Continue saving a pattern on the EEPROM. Appends 32 bytes of
 		 * pattern data after the most recently written block of data
 		 * (i.e., to the pattern which is currently being saved).
 		 *
-		 * @param data pattern data. Must be at least 64 Bytes
+		 * @param data pattern data. Must be at least 32 bytes
 		 */
 		void append(uint8_t *data);
 };
