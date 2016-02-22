@@ -16,7 +16,7 @@ System rocket;
 animation_t active_anim;
 
 uint8_t disp_buf[260]; // 4 byte header + 256 byte data
-uint8_t *rx_buf = disp_buf + sizeof(disp_buf) - 64;
+uint8_t *rx_buf = disp_buf + sizeof(disp_buf) - 32;
 
 void System::initialize()
 {
@@ -124,10 +124,15 @@ void System::receive(void)
 	 * in the RxExpect enum declaration)
 	 */
 	if (rxExpect > PATTERN2) {
-		rx_buf[rx_pos] = modem.buffer_get();
+		rx_buf[rx_pos++] = modem.buffer_get();
+		/*
+		 * The HEADER sets the pattern length and is not included in the
+		 * calculation -> only count bytes for META and DATA.
+		 */
+		if (rxExpect > HEADER2) {
+			remaining_bytes--;
+		}
 	}
-
-	// TODO adjust for 32 Byte rx buffer size
 
 	switch(rxExpect) {
 		case START1:
@@ -159,6 +164,7 @@ void System::receive(void)
 				rxExpect = START_OR_PATTERN;
 			break;
 		case PATTERN2:
+			rx_pos = 0;
 			if (rx_byte == 0xa9)
 				rxExpect = HEADER1;
 			else
@@ -166,7 +172,6 @@ void System::receive(void)
 			break;
 		case HEADER1:
 			rxExpect = HEADER2;
-			rx_pos = 0;
 			remaining_bytes = (rx_byte & 0x0f) << 8;
 			break;
 		case HEADER2:
@@ -180,40 +185,25 @@ void System::receive(void)
 			rxExpect = DATA_FIRSTBLOCK;
 			break;
 		case DATA_FIRSTBLOCK:
-			remaining_bytes--;
 			if (remaining_bytes == 0) {
 				rxExpect = START_OR_PATTERN;
 				storage.save(rx_buf);
-			} else if (rx_pos == 64) {
+			} else if (rx_pos == 32) {
 				rxExpect = DATA;
 				rx_pos = 0;
 				storage.save(rx_buf);
 			}
 			break;
 		case DATA:
-			remaining_bytes--;
 			if (remaining_bytes == 0) {
 				rxExpect = START_OR_PATTERN;
 				storage.append(rx_buf);
-			} else if (rx_pos == 64) {
+			} else if (rx_pos == 32) {
 				rx_pos = 0;
 				storage.append(rx_buf);
 			}
 			break;
 	}
-
-	/*
-	if (i == 127) {
-		i = 0;
-	} else if (modem_byte == 0) {
-		if (i > 1) { // workaround for trailing double null bytes
-			ohai.data = disp_buf;
-			ohai.length = i-1;
-			display.show(&ohai);
-		}
-		i = 0;
-	}
-	*/
 }
 
 void System::loop()
