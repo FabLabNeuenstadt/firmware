@@ -35,13 +35,20 @@ void System::initialize()
 
 	storage.reset();
 	storage.save((uint8_t *)"\x10\x0a\x11\x00nootnoot");
-	storage.save((uint8_t *)"\x10\x0a\x20\x00nootnoot");
+	storage.save((uint8_t *)"\x10\x09\x20\x00" "fnordor");
+	storage.save((uint8_t *)"\x10\x05\x20\x00 \x01 ");
+	storage.save((uint8_t *)"\x20\x22\x08\x02"
+			"\x00\x04\x22\x02\x22\x04\x00\x00"
+			"\x00\x00\x00\x00\x00\x00\x00\x00"
+			"\x00\x04\x22\x02\x22\x04\x00\x00"
+			"\x00\x00\x00\x00");
+	storage.append((uint8_t *)"\x00\x00\x00\x00");
 
 	sei();
 
 	if (storage.hasData()) {
-		current_anim_no = 0;
-		loadPattern(1);
+		current_anim_no = 3;
+		loadPattern(3);
 	} else {
 		active_anim.type = AnimationType::TEXT;
 		active_anim.speed = (2 << 4) + 15;
@@ -94,7 +101,7 @@ void System::loadPattern(uint8_t anim_no)
 		active_anim.direction = disp_buf[3] >> 4;
 	} else if (active_anim.type == AnimationType::FRAMES) {
 		active_anim.speed = ((disp_buf[2] & 0x0f) << 4) + 15;
-		active_anim.delay = (disp_buf[2] & 0x0f) << 4;
+		active_anim.delay = (disp_buf[3] & 0x0f) << 2;
 	}
 
 	active_anim.data = disp_buf + 4;
@@ -231,6 +238,26 @@ void System::loop()
 	}
 	else {
 		want_shutdown = 0;
+	}
+
+	if ((PINC & _BV(PC3)) == 0) {
+		btnMask = (ButtonMask)(btnMask | BUTTON_RIGHT);
+	}
+	if ((PINC & _BV(PC7)) == 0) {
+		btnMask = (ButtonMask)(btnMask | BUTTON_LEFT);
+	}
+	if ((PINC & (_BV(PC3) | _BV(PC7))) == (_BV(PC3) | _BV(PC7))) {
+		if (btnMask == BUTTON_RIGHT) {
+			current_anim_no = (current_anim_no + 1) % storage.numPatterns();
+			loadPattern(current_anim_no);
+		} else if (btnMask == BUTTON_LEFT) {
+			if (current_anim_no == 0)
+				current_anim_no = storage.numPatterns() - 1;
+			else
+				current_anim_no--;
+			loadPattern(current_anim_no);
+		}
+		btnMask = BUTTON_NONE;
 	}
 
 	while (modem.buffer_available()) {

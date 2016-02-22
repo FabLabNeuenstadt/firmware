@@ -14,6 +14,13 @@ class System {
 		void receive(void);
 		void loadPattern(uint8_t anim_no);
 
+		enum ButtonMask : uint8_t {
+			BUTTON_NONE = 0,
+			BUTTON_LEFT = 1,
+			BUTTON_RIGHT = 2,
+			BUTTON_BOTH = 3
+		};
+
 		enum RxExpect : uint8_t {
 			START1,
 			START2,
@@ -29,9 +36,10 @@ class System {
 		};
 
 		RxExpect rxExpect;
+		ButtonMask btnMask;
 
 	public:
-		System() { want_shutdown = 0; rxExpect = START1; current_anim_no = 0;};
+		System() { want_shutdown = 0; rxExpect = START1; current_anim_no = 0; btnMask = BUTTON_NONE;};
 
 		/**
 		 * Initial MCU setup. Turns off unused peripherals to save power

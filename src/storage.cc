@@ -231,6 +231,7 @@ bool Storage::hasData()
 	return true;
 }
 
+// TODO support multi-page reads
 void Storage::load(uint8_t idx, uint8_t *data)
 {
 	uint8_t page_offset;

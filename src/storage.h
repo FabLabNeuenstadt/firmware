@@ -47,6 +47,8 @@ class Storage {
 		 */
 		bool hasData();
 
+		uint8_t numPatterns() { return num_anims; };
+
 		/**
 		 * Load pattern from EEPROM.
 		 *
