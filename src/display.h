@@ -60,7 +60,7 @@ typedef struct animation animation_t;
  */
 class Display {
 	private:
-		animation_t *active_anim;
+		animation_t *current_anim;
 		uint8_t need_update;
 		uint8_t active_col;
 		uint8_t disp_buf[8];
@@ -106,7 +106,7 @@ class Display {
 
 		/**
 		 * Update display content.
-		 * Checks active_anim->speed and active_anim->type and scrolls
+		 * Checks current_anim->speed and current_anim->type and scrolls
 		 * the text / advances a frame when appropriate. Does nothing
 		 * otherwise.
 		 */
