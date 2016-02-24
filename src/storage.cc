@@ -237,6 +237,11 @@ void Storage::reset()
 	num_anims = 0;
 }
 
+void Storage::sync()
+{
+	i2c_write(0, 0, 1, &num_anims);
+}
+
 bool Storage::hasData()
 {
 	// Unprogrammed EEPROM pages always read 0xff
@@ -259,7 +264,6 @@ void Storage::load(uint8_t idx, uint8_t *data)
 void Storage::save(uint8_t *data)
 {
 	num_anims++;
-	i2c_write(0, 0, 1, &num_anims);
 	i2c_write(0, num_anims, 1, &first_free_page);
 	append(data);
 }

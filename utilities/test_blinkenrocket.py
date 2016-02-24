@@ -110,7 +110,7 @@ class TestBlinkenrocket(unittest.TestCase):
     self.assertEquals(text.getRepresentation(),[chr(0x01 << 4), chr(4),chr(7 << 4 | 8),chr(1 << 4 | 0),'M','U','Z','Y'])
     br = blinkenrocket()
     br.addFrame(text)
-    expect = [chr(0x99),chr(0x99),chr(0xA9),chr(0xA9),chr(0x01 << 4), chr(4),chr(7 << 4 | 8),chr(1 << 4 | 0),'M','U','Z','Y']
+    expect = [chr(0x99),chr(0x99),chr(0xA9),chr(0xA9),chr(0x01 << 4), chr(4),chr(7 << 4 | 8),chr(1 << 4 | 0),'M','U','Z','Y',chr(0x84),chr(0x84)]
     self.assertEquals(br.getMessage(),expect)
 
 if __name__ == '__main__':

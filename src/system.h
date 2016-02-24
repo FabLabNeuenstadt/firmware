@@ -24,7 +24,7 @@ class System {
 		enum RxExpect : uint8_t {
 			START1,
 			START2,
-			START_OR_PATTERN,
+			NEXT_BLOCK,
 			PATTERN1,
 			PATTERN2,
 			HEADER1,

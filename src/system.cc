@@ -47,8 +47,8 @@ void System::initialize()
 	sei();
 
 	if (storage.hasData()) {
-		current_anim_no = 3;
-		loadPattern(3);
+		current_anim_no = 0;
+		loadPattern(0);
 	} else {
 		active_anim.type = AnimationType::TEXT;
 		active_anim.speed = (2 << 4) + 15;
@@ -139,36 +139,40 @@ void System::receive(void)
 			if (rx_byte == 0x99)
 				rxExpect = START2;
 			else
-				rxExpect = START_OR_PATTERN;
+				rxExpect = NEXT_BLOCK;
 			break;
 		case START2:
 			if (rx_byte == 0x99) {
 				rxExpect = PATTERN1;
 				storage.reset();
 			} else {
-				rxExpect = START_OR_PATTERN;
+				rxExpect = NEXT_BLOCK;
 			}
 			break;
-		case START_OR_PATTERN:
+		case NEXT_BLOCK:
 			if (rx_byte == 0x99)
 				rxExpect = START2;
 			else if (rx_byte == 0xa9)
 				rxExpect = PATTERN2;
-			else
-				rxExpect = START_OR_PATTERN;
+			else if (rx_byte == 0x84) {
+				storage.sync();
+				current_anim_no = 0;
+				loadPattern(0);
+				rxExpect = START1;
+			}
 			break;
 		case PATTERN1:
 			if (rx_byte == 0xa9)
 				rxExpect = PATTERN2;
 			else
-				rxExpect = START_OR_PATTERN;
+				rxExpect = NEXT_BLOCK;
 			break;
 		case PATTERN2:
 			rx_pos = 0;
 			if (rx_byte == 0xa9)
 				rxExpect = HEADER1;
 			else
-				rxExpect = START_OR_PATTERN;
+				rxExpect = NEXT_BLOCK;
 			break;
 		case HEADER1:
 			rxExpect = HEADER2;
@@ -186,7 +190,7 @@ void System::receive(void)
 			break;
 		case DATA_FIRSTBLOCK:
 			if (remaining_bytes == 0) {
-				rxExpect = START_OR_PATTERN;
+				rxExpect = NEXT_BLOCK;
 				storage.save(rx_buf);
 			} else if (rx_pos == 32) {
 				rxExpect = DATA;
@@ -196,7 +200,7 @@ void System::receive(void)
 			break;
 		case DATA:
 			if (remaining_bytes == 0) {
-				rxExpect = START_OR_PATTERN;
+				rxExpect = NEXT_BLOCK;
 				storage.append(rx_buf);
 			} else if (rx_pos == 32) {
 				rx_pos = 0;

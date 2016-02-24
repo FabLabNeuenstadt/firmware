@@ -195,6 +195,7 @@ class blinkenrocket():
 	eeprom_size = 65536
 	startcode = chr(0x99)
 	patterncode = chr(0xA9)
+	endcode = chr(0x84)
 	frames = []
 
 	def __init__(self,eeprom_size=65536):
@@ -211,6 +212,7 @@ class blinkenrocket():
 		for frame in self.frames:
 			output.extend([self.patterncode,self.patterncode])
 			output.extend(frame.getRepresentation())
+		output.extend([self.endcode,self.endcode])
 		return output
 
 

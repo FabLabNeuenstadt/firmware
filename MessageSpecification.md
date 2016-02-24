@@ -11,6 +11,9 @@ A *`START`* signal which indicates the start of a transmission. It consists of t
 ##### PATTERN 
 A *`PATTERN`* signal which indicates that either the start of an animation or text pattern. It consists of two times the 8-bit binary pattern ( `10101001` respectively `0xA9`)
 
+##### END
+The *`END`* signal indicates End Of Transmission. It consists of two times the 8-bit binary pattern `10000100` respectively `0x84`.
+
 ##### HEADER 
 A generic *`HEADER`* which contains two byte of metadata to describe the data that follows. The two byte contain 12 bit of length information and 4 bit of data type information.
 

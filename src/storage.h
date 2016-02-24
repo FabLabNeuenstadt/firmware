@@ -42,6 +42,8 @@ class Storage {
 		 */
 		void reset();
 
+		void sync();
+
 		/**
 		 * Checks whether the EEPROM contains animathion data.
 		 *
