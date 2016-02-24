@@ -36,12 +36,16 @@ class Storage {
 		 * number of stored animations to zero. The next save operation
 		 * will get pattern id 0 and overwrite the first stored pattern.
 		 *
-		 * This function does not delete patterns from the EEPROM. However,
-		 * it does reset the pattern counter, thus making all saved patterns
-		 * unavailable to the load and numPatterns functions.
+		 * Note that this function does not write anything to the
+		 * EEPROM. Use Storage::sync() for that.
 		 */
 		void reset();
 
+		/**
+		 * Writes the current number of animations (as set by reset() or
+		 * save() to the EEPROM. Required to get a consistent storage state
+		 * after a power cycle.
+		 */
 		void sync();
 
 		/**
