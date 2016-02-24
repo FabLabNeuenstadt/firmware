@@ -253,7 +253,7 @@ void Storage::load(uint8_t idx, uint8_t *data)
 	i2c_read(0, 1 + idx, 1, &page_offset);
 
 	i2c_read(1 + (page_offset / 8), (page_offset % 8) * 32,  2, header);
-	i2c_read(1 + (page_offset / 8), (page_offset % 8) * 32, header[1] + 2, data);
+	i2c_read(1 + (page_offset / 8), (page_offset % 8) * 32, header[1] + 4, data);
 }
 
 void Storage::save(uint8_t *data)

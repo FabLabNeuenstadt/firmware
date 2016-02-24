@@ -16,7 +16,7 @@ System rocket;
 animation_t active_anim;
 
 uint8_t disp_buf[260]; // 4 byte header + 256 byte data
-uint8_t *rx_buf = disp_buf + sizeof(disp_buf) - 32;
+uint8_t *rx_buf = disp_buf + sizeof(disp_buf) - 33;
 
 void System::initialize()
 {
@@ -93,7 +93,7 @@ void System::loadPattern(uint8_t anim_no)
 	storage.load(anim_no, disp_buf);
 
 	active_anim.type = (AnimationType)(disp_buf[0] >> 4);
-	active_anim.length = disp_buf[1] - 2;
+	active_anim.length = disp_buf[1];
 
 	if (active_anim.type == AnimationType::TEXT) {
 		active_anim.speed = (disp_buf[2] & 0xf0) + 15;
@@ -124,12 +124,12 @@ void System::receive(void)
 	 * in the RxExpect enum declaration)
 	 */
 	if (rxExpect > PATTERN2) {
-		rx_buf[rx_pos++] = modem.buffer_get();
+		rx_buf[rx_pos++] = rx_byte;
 		/*
-		 * The HEADER sets the pattern length and is not included in the
-		 * calculation -> only count bytes for META and DATA.
+		 * HEADER and META are not included in the length
+		 * -> only count bytes for DATA.
 		 */
-		if (rxExpect > HEADER2) {
+		if (rxExpect > META2) {
 			remaining_bytes--;
 		}
 	}
