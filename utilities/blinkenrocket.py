@@ -91,6 +91,7 @@ class modem:
 			sound += self.modemcode(ord(byte))
 			self.cnt += 1
 			if self.cnt == 10:
+				sound += self.silence(256) # TODO determine required amount of silence
 				sound += self.generateSyncSignal(2)
 				self.cnt = 0
 		# add some sync signals in the end
@@ -219,9 +220,19 @@ class blinkenrocket():
 
 
 if __name__ == '__main__':
-	m = modem(parity=True)
-	#print list(open(sys.argv[1]).read())
-	m.setData(list(open(sys.argv[1]).read()))
-	m.saveAudio(sys.argv[2])
+	m = modem(parity=True, frequency=16000)
+	b = blinkenrocket()
+
+	b.addFrame(textFrame("Test Foo eins zwei drei"))
+	b.addFrame(textFrame("mrew? "))
+	b.addFrame(textFrame("Und so weiter \x01 "))
+	b.addFrame(animationFrame(map(lambda x : chr(x), [0, 0, 0, 0, 0, 0, 0, 0, 255, 255, 255, 255, 255, 255, 255, 255])))
+	#for i in xrange(10):
+	#	b.addFrame(textFrame(str(100*i)))
+
+	m.setData(b.getMessage())
+	m.saveAudio(sys.argv[1])
+
+	#print b.getMessage()
 
 

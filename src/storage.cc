@@ -168,9 +168,9 @@ uint8_t Storage::i2c_write(uint8_t addrhi, uint8_t addrlo, uint8_t len, uint8_t 
 	 * All other error conditions (even though they should never happen[tm])
 	 * are handled the same way.
 	 */
-	for (num_tries = 0; num_tries < 16; num_tries++) {
+	for (num_tries = 0; num_tries < 32; num_tries++) {
 		if (num_tries > 0)
-			_delay_ms(1);
+			_delay_us(500);
 
 		if (i2c_start_write() != I2C_OK)
 			continue; // EEPROM is busy writing
@@ -205,9 +205,9 @@ uint8_t Storage::i2c_read(uint8_t addrhi, uint8_t addrlo, uint8_t len, uint8_t *
 	/*
 	 * See comments in i2c_write.
 	 */
-	for (num_tries = 0; num_tries < 16; num_tries++) {
+	for (num_tries = 0; num_tries < 32; num_tries++) {
 		if (num_tries > 0)
-			_delay_ms(1);
+			_delay_us(500);
 
 		if (i2c_start_write() != I2C_OK)
 			continue; // EEPROM is busy writing
@@ -232,8 +232,6 @@ uint8_t Storage::i2c_read(uint8_t addrhi, uint8_t addrlo, uint8_t len, uint8_t *
 void Storage::reset()
 {
 	first_free_page = 0;
-	num_anims = 0xff;
-	i2c_write(0, 0, 1, &num_anims); // pretend the EEPROM was never written to
 	num_anims = 0;
 }
 
