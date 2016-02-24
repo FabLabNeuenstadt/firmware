@@ -14,6 +14,12 @@ class System {
 		void receive(void);
 		void loadPattern(uint8_t anim_no);
 
+		enum TransmissionControl : uint8_t {
+			BYTE_END = 0x84,
+			BYTE_START = 0x99,
+			BYTE_PATTERN = 0xa9,
+		};
+
 		enum ButtonMask : uint8_t {
 			BUTTON_NONE = 0,
 			BUTTON_LEFT = 1,

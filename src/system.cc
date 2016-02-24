@@ -136,13 +136,13 @@ void System::receive(void)
 
 	switch(rxExpect) {
 		case START1:
-			if (rx_byte == 0x99)
+			if (rx_byte == BYTE_START)
 				rxExpect = START2;
 			else
 				rxExpect = NEXT_BLOCK;
 			break;
 		case START2:
-			if (rx_byte == 0x99) {
+			if (rx_byte == BYTE_START) {
 				rxExpect = PATTERN1;
 				storage.reset();
 			} else {
@@ -150,11 +150,11 @@ void System::receive(void)
 			}
 			break;
 		case NEXT_BLOCK:
-			if (rx_byte == 0x99)
+			if (rx_byte == BYTE_START)
 				rxExpect = START2;
-			else if (rx_byte == 0xa9)
+			else if (rx_byte == BYTE_PATTERN)
 				rxExpect = PATTERN2;
-			else if (rx_byte == 0x84) {
+			else if (rx_byte == BYTE_END) {
 				storage.sync();
 				current_anim_no = 0;
 				loadPattern(0);
@@ -162,14 +162,14 @@ void System::receive(void)
 			}
 			break;
 		case PATTERN1:
-			if (rx_byte == 0xa9)
+			if (rx_byte == BYTE_PATTERN)
 				rxExpect = PATTERN2;
 			else
 				rxExpect = NEXT_BLOCK;
 			break;
 		case PATTERN2:
 			rx_pos = 0;
-			if (rx_byte == 0xa9)
+			if (rx_byte == BYTE_PATTERN)
 				rxExpect = HEADER1;
 			else
 				rxExpect = NEXT_BLOCK;
