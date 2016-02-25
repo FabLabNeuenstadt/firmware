@@ -85,7 +85,7 @@ class modem:
 			self.data = tmpdata
 		# generate the audio itself
 		# add some sync signal in front
-		sound = self.generateSyncSignal(4)
+		sound = self.silence(256) + self.generateSyncSignal(4)
 		# process the data and insert sync signal every 10 bytes
 		for byte in self.data:
 			sound += self.modemcode(ord(byte))
