@@ -245,7 +245,7 @@ bool Storage::hasData()
 	// Unprogrammed EEPROM pages always read 0xff
 	if (num_anims == 0xff)
 		return false;
-	return true;
+	return num_anims;
 }
 
 // TODO support multi-page reads
