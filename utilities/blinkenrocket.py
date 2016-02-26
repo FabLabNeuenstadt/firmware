@@ -90,9 +90,8 @@ class modem:
 		for byte in self.data:
 			sound += self.modemcode(ord(byte))
 			self.cnt += 1
-			if self.cnt == 10:
-				sound += self.silence(256) # TODO determine required amount of silence
-				sound += self.generateSyncSignal(2)
+			if self.cnt == 9: # ! do not send sync inside (byte1 byte2 parity) triples
+				sound += self.generateSyncSignal(4)
 				self.cnt = 0
 		# add some sync signals in the end
 		sound += self.generateSyncSignal(4)

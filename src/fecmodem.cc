@@ -50,8 +50,9 @@ uint8_t FECModem::hamming2416(uint8_t *byte1, uint8_t *byte2, uint8_t parity)
 
 uint8_t FECModem::buffer_available()
 {
-	if (newTransmission())
-		hammingState = FIRST_BYTE;
+//   XXX this reset implementation is _completely_ broken
+//	if (newTransmission())
+//		hammingState = FIRST_BYTE;
 	if (this->Modem::buffer_available() >= 3)
 		return 2;
 	if (hammingState == SECOND_BYTE)

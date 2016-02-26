@@ -11,7 +11,7 @@
 #include <stdlib.h>
 
 /* Modem ring buffer size must be power of 2 */
-#define MODEM_BUFFER_SIZE	32
+#define MODEM_BUFFER_SIZE	64
 
 /* Modem defines */
 #define MODEM_SYNC_LEN		42
