@@ -90,6 +90,9 @@ void System::initialize()
 
 void System::loadPattern(uint8_t anim_no)
 {
+	if (!storage.hasData())
+		return;
+
 	storage.load(anim_no, disp_buf);
 
 	active_anim.type = (AnimationType)(disp_buf[0] >> 4);

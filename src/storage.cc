@@ -248,7 +248,6 @@ bool Storage::hasData()
 	return num_anims;
 }
 
-// TODO support multi-page reads
 void Storage::load(uint8_t idx, uint8_t *data)
 {
 	uint8_t page_offset;
