@@ -25,6 +25,7 @@ class modem:
 		self.data = data
 		self.parity = parity
 		self.frequency = frequency if frequency in self.supportedFrequencies else 48000
+		self.cnt = 0
 
 	# Calculate Hamming parity for 12,8 code (12 bit of which 8bit data)
 	def hammingCalculateParity128(self, byte):
@@ -222,9 +223,9 @@ if __name__ == '__main__':
 	m = modem(parity=True, frequency=16000)
 	b = blinkenrocket()
 
-	b.addFrame(textFrame("Test Foo eins zwei drei"))
-	b.addFrame(textFrame("mrew? "))
-	b.addFrame(textFrame("Und so weiter \x01 "))
+	for message in sys.argv[2:]:
+		b.addFrame(textFrame(message, speed=1))
+	b.addFrame(textFrame(" \x04 "))
 	b.addFrame(animationFrame(map(lambda x : chr(x), [0, 0, 0, 0, 0, 0, 0, 0, 255, 255, 255, 255, 255, 255, 255, 255])))
 	#for i in xrange(10):
 	#	b.addFrame(textFrame(str(100*i)))

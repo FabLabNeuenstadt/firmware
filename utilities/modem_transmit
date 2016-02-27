@@ -2,7 +2,7 @@
 
 OUT="$(mktemp)"
 
-python blinkenrocket.py $OUT
+python blinkenrocket.py $OUT "$@"
 
 case "$(uname -s)" in
 Darwin)
