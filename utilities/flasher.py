@@ -62,8 +62,7 @@ def printError():
 
 flash_command = sys.argv[1]
 
-print colored("Using the following command to flash: ", "green")
-print flash_command 
+print colored("Using the following command to flash: %s" % flash_command, "green")
 
 while True:
 	print colored("Press any key to continue or 'q' to quit.","yellow")
