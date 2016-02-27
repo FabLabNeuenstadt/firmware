@@ -220,7 +220,7 @@ class blinkenrocket():
 
 
 if __name__ == '__main__':
-	m = modem(parity=True, frequency=16000)
+	m = modem(parity=True, frequency=48000)
 	b = blinkenrocket()
 
 	for message in sys.argv[2:]:
