@@ -2,6 +2,18 @@
 
 #define SHUTDOWN_THRESHOLD 2048
 
+// TODO find a nice image
+const uint8_t systemPowerdownImage[] = {
+	0x00,
+	0x00,
+	0x08,
+	0x08,
+	0x08,
+	0x08,
+	0x00,
+	0x00
+};
+
 /**
  * Contains the system idle loop. Checks for button presses, handles
  * standby/resume, reads data from the Modem and updates the Display.

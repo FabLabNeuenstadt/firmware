@@ -125,6 +125,7 @@ void Display::reset()
 		disp_buf[i] = 0xff;
 	str_pos = 0;
 	char_pos = -1;
+	need_update = 1;
 	status = RUNNING;
 }
 

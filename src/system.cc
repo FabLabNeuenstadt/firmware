@@ -46,9 +46,28 @@ void System::initialize()
 
 	sei();
 
+	current_anim_no = 0;
+	loadPattern(0);
+}
+
+void System::loadPattern(uint8_t anim_no)
+{
 	if (storage.hasData()) {
-		current_anim_no = 0;
-		loadPattern(0);
+		storage.load(anim_no, disp_buf);
+
+		active_anim.type = (AnimationType)(disp_buf[0] >> 4);
+		active_anim.length = disp_buf[1];
+
+		if (active_anim.type == AnimationType::TEXT) {
+			active_anim.speed = (disp_buf[2] & 0xf0) + 15;
+			active_anim.delay = (disp_buf[2] & 0x0f ) << 4;
+			active_anim.direction = disp_buf[3] >> 4;
+		} else if (active_anim.type == AnimationType::FRAMES) {
+			active_anim.speed = ((disp_buf[2] & 0x0f) << 4) + 15;
+			active_anim.delay = (disp_buf[3] & 0x0f) << 2;
+		}
+
+		active_anim.data = disp_buf + 4;
 	} else {
 		active_anim.type = AnimationType::TEXT;
 		active_anim.speed = (2 << 4) + 15;
@@ -84,30 +103,6 @@ void System::initialize()
 		disp_buf[24] = 't';
 		disp_buf[25] = 'y';
 	}
-
-	display.show(&active_anim);
-}
-
-void System::loadPattern(uint8_t anim_no)
-{
-	if (!storage.hasData())
-		return;
-
-	storage.load(anim_no, disp_buf);
-
-	active_anim.type = (AnimationType)(disp_buf[0] >> 4);
-	active_anim.length = disp_buf[1];
-
-	if (active_anim.type == AnimationType::TEXT) {
-		active_anim.speed = (disp_buf[2] & 0xf0) + 15;
-		active_anim.delay = (disp_buf[2] & 0x0f ) << 4;
-		active_anim.direction = disp_buf[3] >> 4;
-	} else if (active_anim.type == AnimationType::FRAMES) {
-		active_anim.speed = ((disp_buf[2] & 0x0f) << 4) + 15;
-		active_anim.delay = (disp_buf[3] & 0x0f) << 2;
-	}
-
-	active_anim.data = disp_buf + 4;
 
 	display.show(&active_anim);
 }
@@ -268,16 +263,31 @@ void System::loop()
 
 void System::shutdown()
 {
-	// turn off display to indicate we're about to shut down
-	display.disable();
-
 	modem.disable();
+
+	// show power down image
+	disp_buf[0] = systemPowerdownImage[0];
+	disp_buf[1] = systemPowerdownImage[1];
+	disp_buf[2] = systemPowerdownImage[2];
+	disp_buf[3] = systemPowerdownImage[3];
+	disp_buf[4] = systemPowerdownImage[4];
+	disp_buf[5] = systemPowerdownImage[5];
+	disp_buf[6] = systemPowerdownImage[6];
+	disp_buf[7] = systemPowerdownImage[7];
+	active_anim.data = disp_buf;
+	active_anim.type = AnimationType::FRAMES;
+	active_anim.length = 8;
+	display.show(&active_anim);
+	display.update(); // we left the main loop, so we need to call this manually
 
 	// wait until both buttons are released
 	while (!((PINC & _BV(PC3)) && (PINC & _BV(PC7)))) ;
 
 	// and some more to debounce the buttons
-	_delay_ms(10);
+	_delay_ms(50);
+
+	// turn off display to indicate we're about to shut down
+	display.disable();
 
 	// actual naptime
 
@@ -293,7 +303,11 @@ void System::shutdown()
 	// Don't disable PCICR, something else might need it.
 	PCMSK1 &= ~(_BV(PCINT15) | _BV(PCINT11));
 
+	// debounce
+	_delay_ms(50);
+
 	// turn on display
+	loadPattern(current_anim_no);
 	display.enable();
 
 	// ... and modem
