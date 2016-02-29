@@ -143,6 +143,7 @@ void System::receive(void)
 			if (rx_byte == BYTE_START) {
 				rxExpect = PATTERN1;
 				storage.reset();
+				dispFlashing();
 			} else {
 				rxExpect = NEXT_BLOCK;
 			}
@@ -261,11 +262,8 @@ void System::loop()
 	display.update();
 }
 
-void System::shutdown()
+void System::dispPowerdown()
 {
-	modem.disable();
-
-	// show power down image
 	disp_buf[0] = systemPowerdownImage[0];
 	disp_buf[1] = systemPowerdownImage[1];
 	disp_buf[2] = systemPowerdownImage[2];
@@ -278,6 +276,43 @@ void System::shutdown()
 	active_anim.type = AnimationType::FRAMES;
 	active_anim.length = 8;
 	display.show(&active_anim);
+}
+
+void System::dispFlashing()
+{
+	// manually unrolled loop to make sure systemFlashImage doesn't end up
+	// in memory
+	disp_buf[0] = systemFlashImage[0];
+	disp_buf[1] = systemFlashImage[1];
+	disp_buf[2] = systemFlashImage[2];
+	disp_buf[3] = systemFlashImage[3];
+	disp_buf[4] = systemFlashImage[4];
+	disp_buf[5] = systemFlashImage[5];
+	disp_buf[6] = systemFlashImage[6];
+	disp_buf[7] = systemFlashImage[7];
+	disp_buf[8] = systemFlashImage[8];
+	disp_buf[9] = systemFlashImage[9];
+	disp_buf[10] = systemFlashImage[10];
+	disp_buf[11] = systemFlashImage[11];
+	disp_buf[12] = systemFlashImage[12];
+	disp_buf[13] = systemFlashImage[13];
+	disp_buf[14] = systemFlashImage[14];
+	disp_buf[15] = systemFlashImage[15];
+
+	active_anim.data = disp_buf;
+	active_anim.type = AnimationType::FRAMES;
+	active_anim.length = 16;
+	active_anim.delay = 0;
+	active_anim.speed = 96;
+	display.show(&active_anim);
+}
+
+void System::shutdown()
+{
+	modem.disable();
+
+	// show power down image
+	dispPowerdown();
 	display.update(); // we left the main loop, so we need to call this manually
 
 	// wait until both buttons are released
