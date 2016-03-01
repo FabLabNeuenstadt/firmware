@@ -52,29 +52,34 @@ void System::initialize()
 	loadPattern(0);
 }
 
-void System::loadPattern_P(const uint8_t *anim_ptr)
+void System::loadPattern_P(const uint8_t *pattern_ptr)
 {
 	uint8_t i;
 
 	for (i = 0; i < 4; i++)
-		disp_buf[i] = pgm_read_byte(anim_ptr + i);
+		disp_buf[i] = pgm_read_byte(pattern_ptr + i);
 
 	for (i = 0; i < disp_buf[1]; i++)
-		disp_buf[i+4] = pgm_read_byte(anim_ptr + i + 4);
+		disp_buf[i+4] = pgm_read_byte(pattern_ptr + i + 4);
 
-	active_anim.type = (AnimationType)(disp_buf[0] >> 4);
-	active_anim.length = disp_buf[1];
+	loadPattern_buf(disp_buf);
+}
+
+void System::loadPattern_buf(uint8_t *pattern)
+{
+	active_anim.type = (AnimationType)(pattern[0] >> 4);
+	active_anim.length = pattern[1];
 
 	if (active_anim.type == AnimationType::TEXT) {
-		active_anim.speed = (disp_buf[2] & 0xf0) + 15;
-		active_anim.delay = (disp_buf[2] & 0x0f ) << 4;
-		active_anim.direction = disp_buf[3] >> 4;
+		active_anim.speed = (pattern[2] & 0xf0) + 15;
+		active_anim.delay = (pattern[2] & 0x0f ) << 4;
+		active_anim.direction = pattern[3] >> 4;
 	} else if (active_anim.type == AnimationType::FRAMES) {
-		active_anim.speed = ((disp_buf[2] & 0x0f) << 4) + 15;
-		active_anim.delay = (disp_buf[3] & 0x0f) << 2;
+		active_anim.speed = ((pattern[2] & 0x0f) << 4) + 15;
+		active_anim.delay = (pattern[3] & 0x0f) << 2;
 	}
 
-	active_anim.data = disp_buf + 4;
+	active_anim.data = pattern + 4;
 	display.show(&active_anim);
 }
 
@@ -82,25 +87,10 @@ void System::loadPattern(uint8_t anim_no)
 {
 	if (storage.hasData()) {
 		storage.load(anim_no, disp_buf);
-
-		active_anim.type = (AnimationType)(disp_buf[0] >> 4);
-		active_anim.length = disp_buf[1];
-
-		if (active_anim.type == AnimationType::TEXT) {
-			active_anim.speed = (disp_buf[2] & 0xf0) + 15;
-			active_anim.delay = (disp_buf[2] & 0x0f ) << 4;
-			active_anim.direction = disp_buf[3] >> 4;
-		} else if (active_anim.type == AnimationType::FRAMES) {
-			active_anim.speed = ((disp_buf[2] & 0x0f) << 4) + 15;
-			active_anim.delay = (disp_buf[3] & 0x0f) << 2;
-		}
-
-		active_anim.data = disp_buf + 4;
+		loadPattern_buf(disp_buf);
 	} else {
 		loadPattern_P(emptyPattern);
 	}
-
-	display.show(&active_anim);
 }
 
 // ! This function has not been tested yet
@@ -271,10 +261,10 @@ void System::shutdown()
 	while (!((PINC & _BV(PC3)) && (PINC & _BV(PC7))))
 		display.update();
 
-	// and some more to debounce the buttons
-	for (i = 0; i < 50; i++) {
+	// and some more to debounce the buttons (and finish powerdown animation)
+	for (i = 0; i < 100; i++) {
 		display.update();
-		_delay_ms(1);
+		_delay_ms(2);
 	}
 
 	// turn off display to indicate we're about to shut down

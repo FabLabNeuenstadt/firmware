@@ -12,8 +12,9 @@ class System {
 		uint8_t current_anim_no;
 		void shutdown(void);
 		void receive(void);
-		void loadPattern(uint8_t anim_no);
-		void loadPattern_P(const uint8_t *anim_ptr);
+		void loadPattern(uint8_t pattern_no);
+		void loadPattern_buf(uint8_t *pattern);
+		void loadPattern_P(const uint8_t *pattern_ptr);
 
 		enum TransmissionControl : uint8_t {
 			BYTE_END = 0x84,
