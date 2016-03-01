@@ -1,6 +1,7 @@
 #include <avr/io.h>
 #include <avr/interrupt.h>
 #include <avr/wdt.h>
+#include <avr/pgmspace.h>
 #include <util/delay.h>
 #include <stdlib.h>
 
@@ -8,6 +9,7 @@
 #include "fecmodem.h"
 #include "storage.h"
 #include "system.h"
+#include "static_patterns.h"
 
 #define SHUTDOWN_THRESHOLD 2048
 
@@ -48,6 +50,32 @@ void System::initialize()
 
 	current_anim_no = 0;
 	loadPattern(0);
+}
+
+void System::loadPattern_P(const uint8_t *anim_ptr)
+{
+	uint8_t i;
+
+	for (i = 0; i < 4; i++)
+		disp_buf[i] = pgm_read_byte(anim_ptr + i);
+
+	for (i = 0; i < disp_buf[1]; i++)
+		disp_buf[i+4] = pgm_read_byte(anim_ptr + i + 4);
+
+	active_anim.type = (AnimationType)(disp_buf[0] >> 4);
+	active_anim.length = disp_buf[1];
+
+	if (active_anim.type == AnimationType::TEXT) {
+		active_anim.speed = (disp_buf[2] & 0xf0) + 15;
+		active_anim.delay = (disp_buf[2] & 0x0f ) << 4;
+		active_anim.direction = disp_buf[3] >> 4;
+	} else if (active_anim.type == AnimationType::FRAMES) {
+		active_anim.speed = ((disp_buf[2] & 0x0f) << 4) + 15;
+		active_anim.delay = (disp_buf[3] & 0x0f) << 2;
+	}
+
+	active_anim.data = disp_buf + 4;
+	display.show(&active_anim);
 }
 
 void System::loadPattern(uint8_t anim_no)
@@ -143,7 +171,7 @@ void System::receive(void)
 			if (rx_byte == BYTE_START) {
 				rxExpect = PATTERN1;
 				storage.reset();
-				dispFlashing();
+				loadPattern_P(flashingPattern);
 			} else {
 				rxExpect = NEXT_BLOCK;
 			}
@@ -262,64 +290,24 @@ void System::loop()
 	display.update();
 }
 
-void System::dispPowerdown()
-{
-	disp_buf[0] = systemPowerdownImage[0];
-	disp_buf[1] = systemPowerdownImage[1];
-	disp_buf[2] = systemPowerdownImage[2];
-	disp_buf[3] = systemPowerdownImage[3];
-	disp_buf[4] = systemPowerdownImage[4];
-	disp_buf[5] = systemPowerdownImage[5];
-	disp_buf[6] = systemPowerdownImage[6];
-	disp_buf[7] = systemPowerdownImage[7];
-	active_anim.data = disp_buf;
-	active_anim.type = AnimationType::FRAMES;
-	active_anim.length = 8;
-	display.show(&active_anim);
-}
-
-void System::dispFlashing()
-{
-	// manually unrolled loop to make sure systemFlashImage doesn't end up
-	// in memory
-	disp_buf[0] = systemFlashImage[0];
-	disp_buf[1] = systemFlashImage[1];
-	disp_buf[2] = systemFlashImage[2];
-	disp_buf[3] = systemFlashImage[3];
-	disp_buf[4] = systemFlashImage[4];
-	disp_buf[5] = systemFlashImage[5];
-	disp_buf[6] = systemFlashImage[6];
-	disp_buf[7] = systemFlashImage[7];
-	disp_buf[8] = systemFlashImage[8];
-	disp_buf[9] = systemFlashImage[9];
-	disp_buf[10] = systemFlashImage[10];
-	disp_buf[11] = systemFlashImage[11];
-	disp_buf[12] = systemFlashImage[12];
-	disp_buf[13] = systemFlashImage[13];
-	disp_buf[14] = systemFlashImage[14];
-	disp_buf[15] = systemFlashImage[15];
-
-	active_anim.data = disp_buf;
-	active_anim.type = AnimationType::FRAMES;
-	active_anim.length = 16;
-	active_anim.delay = 0;
-	active_anim.speed = 96;
-	display.show(&active_anim);
-}
-
 void System::shutdown()
 {
+	uint8_t i;
+
 	modem.disable();
 
 	// show power down image
-	dispPowerdown();
-	display.update(); // we left the main loop, so we need to call this manually
+	loadPattern_P(shutdownPattern);
 
 	// wait until both buttons are released
-	while (!((PINC & _BV(PC3)) && (PINC & _BV(PC7)))) ;
+	while (!((PINC & _BV(PC3)) && (PINC & _BV(PC7))))
+		display.update();
 
 	// and some more to debounce the buttons
-	_delay_ms(50);
+	for (i = 0; i < 50; i++) {
+		display.update();
+		_delay_ms(1);
+	}
 
 	// turn off display to indicate we're about to shut down
 	display.disable();

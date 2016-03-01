@@ -2,38 +2,6 @@
 
 #define SHUTDOWN_THRESHOLD 2048
 
-// TODO find a nice image
-const uint8_t systemPowerdownImage[] = {
-	0x00,
-	0x00,
-	0x08,
-	0x08,
-	0x08,
-	0x08,
-	0x00,
-	0x00
-};
-
-// TODO dito?
-const uint8_t systemFlashImage[] = {
-	0x00,
-	0x00,
-	0x00,
-	0x00,
-	0x00,
-	0x00,
-	0x00,
-	0x00,
-	0x00,
-	0x00,
-	0x07,
-	0x33,
-	0x55,
-	0x98,
-	0x00,
-	0x00
-};
-
 /**
  * Contains the system idle loop. Checks for button presses, handles
  * standby/resume, reads data from the Modem and updates the Display.
@@ -45,8 +13,7 @@ class System {
 		void shutdown(void);
 		void receive(void);
 		void loadPattern(uint8_t anim_no);
-		void dispPowerdown();
-		void dispFlashing();
+		void loadPattern_P(const uint8_t *anim_ptr);
 
 		enum TransmissionControl : uint8_t {
 			BYTE_END = 0x84,
