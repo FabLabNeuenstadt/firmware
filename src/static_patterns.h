@@ -23,5 +23,12 @@ const uint8_t PROGMEM flashingPattern[] = {
 	0x00, 0x00, 0x07, 0x33, 0x55, 0x98, 0x00, 0x00
 };
 
+const uint8_t PROGMEM emptyPattern[] = {
+	0x10, 0x1a,
+	0x20, 0x00,
+	' ',   1, ' ', 'O', 'h', 'a', 'i', ' ', '-' ,' ',
+	'S', 't', 'o', 'r', 'a', 'g', 'e', ' ', 'i', 's',
+	' ', 'e', 'm', 'p', 't', 'y'
+};
 
 #endif /* STATIC_PATTERNS_H_ */

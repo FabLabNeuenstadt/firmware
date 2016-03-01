@@ -97,39 +97,7 @@ void System::loadPattern(uint8_t anim_no)
 
 		active_anim.data = disp_buf + 4;
 	} else {
-		active_anim.type = AnimationType::TEXT;
-		active_anim.speed = (2 << 4) + 15;
-		active_anim.data = disp_buf;
-		active_anim.length = 26;
-		active_anim.delay = (0 << 4) + 0;
-
-		// no strcpy_P or similar to save space
-		disp_buf[0] = ' ';
-		disp_buf[1] = 1;
-		disp_buf[2] = ' ';
-		disp_buf[3] = 'O';
-		disp_buf[4] = 'h';
-		disp_buf[5] = 'a';
-		disp_buf[6] = 'i';
-		disp_buf[7] = ' ';
-		disp_buf[8] = '-';
-		disp_buf[9] = ' ';
-		disp_buf[10] = 'S';
-		disp_buf[11] = 't';
-		disp_buf[12] = 'o';
-		disp_buf[13] = 'r';
-		disp_buf[14] = 'a';
-		disp_buf[15] = 'g';
-		disp_buf[16] = 'e';
-		disp_buf[17] = ' ';
-		disp_buf[18] = 'i';
-		disp_buf[19] = 's';
-		disp_buf[20] = ' ';
-		disp_buf[21] = 'e';
-		disp_buf[22] = 'm';
-		disp_buf[23] = 'p';
-		disp_buf[24] = 't';
-		disp_buf[25] = 'y';
+		loadPattern_P(emptyPattern);
 	}
 
 	display.show(&active_anim);
