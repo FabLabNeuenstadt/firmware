@@ -3,7 +3,7 @@
  * Audio modem for Attiny85 & other AVR chips with modifications
  *
  * Author: Jari Tulilahti
- * Copyright: 2014 Rakettitiede Oy
+ * Copyright: 2014 Rakettitiede Oy and 2016 Daniel Friesel
  * License: LGPLv3, see COPYING, and COPYING.LESSER -files for more info
  */
 

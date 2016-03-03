@@ -1,3 +1,13 @@
+/*
+ * Copyright (C) 2016 by Daniel Friesel
+ *
+ * License: You may use, redistribute and/or modify this file under the terms
+ * of either:
+ * * The GNU LGPL v3 (see COPYING and COPYING.LESSER), or
+ * * The 3-clause BSD License (see COPYING.BSD)
+ *
+ */
+
 #include <avr/io.h>
 #include <stdlib.h>
 

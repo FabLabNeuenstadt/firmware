@@ -1,6 +1,6 @@
 /* Name: modem.h
  * Author: Jari Tulilahti
- * Copyright: 2014 Rakettitiede Oy
+ * Copyright: 2014 Rakettitiede Oy and Daniel Friesel
  * License: LGPLv3, see COPYING, and COPYING.LESSER -files for more info
  */
 
