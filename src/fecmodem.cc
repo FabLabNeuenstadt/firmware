@@ -58,6 +58,12 @@ uint8_t FECModem::hamming2416(uint8_t *byte1, uint8_t *byte2, uint8_t parity)
 	return 0;
 }
 
+void FECModem::enable()
+{
+	this->Modem::enable();
+	hammingState = FIRST_BYTE;
+}
+
 uint8_t FECModem::buffer_available()
 {
 //   XXX this reset implementation is _completely_ broken

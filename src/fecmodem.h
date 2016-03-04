@@ -37,7 +37,9 @@ class FECModem : public Modem {
 		uint8_t correct128(uint8_t *byte, uint8_t parity);
 		uint8_t hamming2416(uint8_t *byte1, uint8_t *byte2, uint8_t parity);
 	public:
-		FECModem() : Modem() { hammingState = FIRST_BYTE; };
+		FECModem() : Modem() {};
+
+		void enable(void);
 
 		/**
 		 * Checks if there are unprocessed bytes in the receive buffer.
