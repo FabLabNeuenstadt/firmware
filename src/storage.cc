@@ -270,16 +270,41 @@ void Storage::load(uint8_t idx, uint8_t *data)
 
 void Storage::save(uint8_t *data)
 {
-	num_anims++;
-	i2c_write(0, num_anims, 1, &first_free_page);
-	append(data);
+	/*
+	 * Technically, we can store up to 255 patterns. However, Allowing
+	 * 255 patterns (-> num_anims = 0xff) means we can't easily
+	 * distinguish between an EEPROM with 255 patterns and a factory-new
+	 * EEPROM (which just reads 0xff everywhere). So only 254 patterns
+	 * are allowed.
+	 */
+	if (num_anims < 254) {
+		/*
+		* Bytes 0 .. 255 (pages 0 .. 7) are reserved for storage metadata,
+		* first_free_page counts pages starting at byte 256 (page 8).
+		* So, first_free_page == 247 addresses EEPROM bytes 8160 .. 8191.
+		* first_free_page == 248 would address bytes 8192 and up, which don't
+		* exist -> don't save anything afterwards.
+		*
+		* Note that at the moment (stored patterns are aligned to page
+		* boundaries) this means we can actually only store up to 248
+		* patterns.
+		*/
+		if (first_free_page < 248) {
+			num_anims++;
+			i2c_write(0, num_anims, 1, &first_free_page);
+			append(data);
+		}
+	}
 }
 
 void Storage::append(uint8_t *data)
 {
-	// the header indicates the length of the data, but we really don't care
-	// - it's easier to just write the whole page and skip the trailing
-	// garbage when reading.
-	i2c_write(1 + (first_free_page / 8), (first_free_page % 8) * 32, 32, data);
-	first_free_page++;
+	// see comment in Storage::save()
+	if (first_free_page < 248) {
+		// the header indicates the length of the data, but we really don't care
+		// - it's easier to just write the whole page and skip the trailing
+		// garbage when reading.
+		i2c_write(1 + (first_free_page / 8), (first_free_page % 8) * 32, 32, data);
+		first_free_page++;
+	}
 }
