@@ -61,7 +61,7 @@ class Storage {
 		/**
 		 * Checks whether the EEPROM contains animathion data.
 		 *
-		 * @return true if the EEPROm contains valid-looking data
+		 * @return true if the EEPROM contains valid-looking data
 		 */
 		bool hasData();
 

@@ -39,6 +39,10 @@ class FECModem : public Modem {
 	public:
 		FECModem() : Modem() {};
 
+		/**
+		 * Enable the modem. Resets the internal Hamming state and calls
+		 * Modem::enable().
+		 */
 		void enable(void);
 
 		/**
