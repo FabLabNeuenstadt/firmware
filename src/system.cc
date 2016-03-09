@@ -182,6 +182,12 @@ void System::receive(void)
 			break;
 		case META2:
 			rxExpect = DATA_FIRSTBLOCK;
+			/*
+			 * skip empty patterns (would bork because of remaining_bytes--
+			 * otherwise
+			 */
+			if (remaining_bytes == 0)
+				rxExpect = NEXT_BLOCK;
 			break;
 		case DATA_FIRSTBLOCK:
 			if (remaining_bytes == 0) {
