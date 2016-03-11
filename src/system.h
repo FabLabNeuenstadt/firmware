@@ -75,6 +75,8 @@ class System {
 		 * whenever the system is woken up by an interrupt.
 		 */
 		void loop(void);
+
+		void handleTimeout(void);
 };
 
 extern System rocket;

@@ -140,6 +140,12 @@ void System::receive(void)
 				rxExpect = PATTERN1;
 				storage.reset();
 				loadPattern_P(flashingPattern);
+				MCUSR &= ~_BV(WDRF);
+				cli();
+				// watchdog interrupt after 4 seconds
+				WDTCSR = _BV(WDCE) | _BV(WDE);
+				WDTCSR = _BV(WDIE) | _BV(WDP3);
+				sei();
 			} else {
 				rxExpect = NEXT_BLOCK;
 			}
@@ -154,6 +160,7 @@ void System::receive(void)
 				current_anim_no = 0;
 				loadPattern(0);
 				rxExpect = START1;
+				wdt_disable();
 			}
 			break;
 		case PATTERN1:
@@ -176,6 +183,7 @@ void System::receive(void)
 		case HEADER2:
 			rxExpect = META1;
 			remaining_bytes += rx_byte;
+			wdt_reset();
 			break;
 		case META1:
 			rxExpect = META2;
@@ -314,7 +322,24 @@ void System::shutdown()
 	rxExpect = START1;
 }
 
+void System::handleTimeout()
+{
+	rxExpect = START1;
+	current_anim_no = 0;
+	loadPattern_P(timeoutPattern);
+}
+
 ISR(PCINT1_vect)
 {
 	// we use PCINT1 for wakeup, so we need an (in this case empty) ISR for it
+}
+
+ISR(WDT_vect)
+{
+	/*
+	 * Modem transmission was interrupted without END byte. Reset state
+	 * machine and show timeout message.
+	 */
+	wdt_disable();
+	rocket.handleTimeout();
 }

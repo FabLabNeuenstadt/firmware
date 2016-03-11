@@ -41,4 +41,10 @@ const uint8_t PROGMEM emptyPattern[] = {
 	'e', ' ', 'i', 's', ' ', 'e', 'm', 'p', 't', 'y'
 };
 
+const uint8_t PROGMEM timeoutPattern[] = {
+	0x10, 0x0a,
+	0x20, 0x00,
+	' ', 2, ' ', 'T', 'i', 'm', 'e', 'o', 'u', 't'
+};
+
 #endif /* STATIC_PATTERNS_H_ */
