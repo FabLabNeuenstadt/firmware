@@ -34,11 +34,11 @@ const uint8_t PROGMEM flashingPattern[] = {
 };
 
 const uint8_t PROGMEM emptyPattern[] = {
-	0x10, 0x1a,
+	0x10, 0x28,
 	0x20, 0x00,
-	' ',   1, ' ', 'O', 'h', 'a', 'i', ' ', '-' ,' ',
-	'S', 't', 'o', 'r', 'a', 'g', 'e', ' ', 'i', 's',
-	' ', 'e', 'm', 'p', 't', 'y'
+	' ',   1, ' ', 'B', 'l', 'i', 'n', 'k', 'e', 'n', 'r', 'o', 'c', 'k', 'e',
+	't', ' ', 'v', '0', '.', '9', ' ', '-', ' ', 'S', 't', 'o', 'r', 'a', 'g',
+	'e', ' ', 'i', 's', ' ', 'e', 'm', 'p', 't', 'y'
 };
 
 #endif /* STATIC_PATTERNS_H_ */
