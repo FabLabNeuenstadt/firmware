@@ -33,6 +33,15 @@ const uint8_t PROGMEM flashingPattern[] = {
 	0x00, 0x00, 0x07, 0x33, 0x55, 0x98, 0x00, 0x00
 };
 
+#ifdef LANG_DE
+const uint8_t PROGMEM emptyPattern[] = {
+	0x10, 0x29,
+	0x20, 0x00,
+	' ',   1, ' ', 'B', 'l', 'i', 'n', 'k', 'e', 'n', 'r', 'o', 'c', 'k', 'e',
+	't', ' ', 'v', '0', '.', '9', ' ', '-', ' ', 'S', 'p', 'e', 'i', 'c', 'h',
+	'e', 'r', ' ', 'i', 's', 't', ' ', 'l', 'e', 'e', 'r'
+};
+#else
 const uint8_t PROGMEM emptyPattern[] = {
 	0x10, 0x28,
 	0x20, 0x00,
@@ -40,11 +49,22 @@ const uint8_t PROGMEM emptyPattern[] = {
 	't', ' ', 'v', '0', '.', '9', ' ', '-', ' ', 'S', 't', 'o', 'r', 'a', 'g',
 	'e', ' ', 'i', 's', ' ', 'e', 'm', 'p', 't', 'y'
 };
+#endif
 
+#ifdef LANG_DE
 const uint8_t PROGMEM timeoutPattern[] = {
-	0x10, 0x0a,
+	0x10, 0x16,
 	0x20, 0x00,
-	' ', 2, ' ', 'T', 'i', 'm', 'e', 'o', 'u', 't'
+	' ',   2, ' ', 'U', 'e', 'b', 'e', 'r', 't', 'r', 'a', 'g', 'u', 'n', 'g',
+	's', 'f', 'e', 'h', 'l', 'e', 'r'
 };
+#else
+const uint8_t PROGMEM timeoutPattern[] = {
+	0x10, 0x15,
+	0x20, 0x00,
+	' ',   2, ' ', 'T', 'r', 'a', 'n', 's', 'm', 'i', 's', 's', 'i', 'o', 'n',
+	' ', 'e', 'r', 'r', 'o', 'r'
+};
+#endif
 
 #endif /* STATIC_PATTERNS_H_ */

@@ -14,6 +14,10 @@ SHARED_FLAGS = ${MCU_FLAGS} -I. -Os -Wall -Wextra -pedantic
 SHARED_FLAGS += -funsigned-char -funsigned-bitfields -fpack-struct -fshort-enums
 SHARED_FLAGS += -flto -mstrict-X
 
+ifeq (${LANG},DE)
+	SHARED_FLAGS += -DLANG_DE
+endif
+
 CFLAGS += ${SHARED_FLAGS} -std=c11
 CXXFLAGS += ${SHARED_FLAGS} -std=c++11 -fno-rtti -fno-exceptions
 
