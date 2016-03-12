@@ -16,7 +16,6 @@ class Storage {
 	private:
 		uint8_t num_anims;
 		uint8_t page_offset;
-		uint8_t header[2];
 		uint8_t first_free_page;
 		uint8_t i2c_start_write(void);
 		uint8_t i2c_start_read(void);

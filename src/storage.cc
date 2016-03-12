@@ -262,19 +262,21 @@ void Storage::load(uint8_t idx, uint8_t *data)
 {
 	i2c_read(0, 1 + idx, 1, &page_offset);
 
-	// always read headers
-	i2c_read(1 + (page_offset / 8), (page_offset % 8) * 32,  4, data);
-
-	header[0] = data[0];
-	header[1] = data[1];
-
-	// always read 128 bytes - the system will ignore trailing bytes
-	i2c_read(1 + (page_offset / 8), (page_offset % 8) * 32 + 4, 128, data + 4);
+	/*
+	 * Unconditionally read 132 bytes. The data buffer must hold at least
+	 * 132 bytes anyways, and this way we can save one I2C transaction. If
+	 * there is any speed penalty cause by this I wasn't able to notice it.
+	 * Also note that the EEPROM automatically wraps around when the end of
+	 * memory is reached, so this edge case doesn't need to be accounted for.
+	 */
+	i2c_read(1 + (page_offset / 8), (page_offset % 8) * 32, 132, data);
 }
 
 void Storage::loadChunk(uint8_t chunk, uint8_t *data)
 {
 	uint8_t this_page_offset = page_offset + (4 * chunk);
+
+	// Note that we do not load headers here -> 128 instead of 132 bytes
 	i2c_read(1 + (this_page_offset / 8), (this_page_offset % 8) * 32 + 4, 128, data);
 }
 
