@@ -15,6 +15,7 @@
 
 #include "display.h"
 #include "font.h"
+#include "storage.h"
 
 Display display;
 
@@ -84,7 +85,7 @@ void Display::update() {
 				if (current_anim->direction == 0)
 					glyph_addr = (uint8_t *)pgm_read_ptr(&font[current_anim->data[str_pos]]);
 				else
-					glyph_addr = (uint8_t *)pgm_read_ptr(&font[current_anim->data[current_anim->length - 1 - str_pos]]);
+					glyph_addr = (uint8_t *)pgm_read_ptr(&font[current_anim->data[current_anim->length - 1 - str_pos]]); // XXX Broken by str_chunk changes, FIXME!
 				glyph_len = pgm_read_byte(&glyph_addr[0]);
 				char_pos++;
 
@@ -113,10 +114,20 @@ void Display::update() {
 				}
 				str_pos += 8;
 			}
-			if (str_pos >= current_anim->length) {
+			if ((current_anim->length >= 128) && (str_pos >= 128)) {
+				str_pos = 0;
+				str_chunk++;
+				storage.loadChunk(str_chunk, current_anim->data);
+			}
+			if ((str_chunk == (current_anim->length / 128))
+					&& (str_pos >= (current_anim->length % 128))) {
+				str_chunk = 0;
 				str_pos = 0;
 				if (current_anim->delay > 0) {
 					status = PAUSED;
+				}
+				if (current_anim->length >= 128) {
+					storage.loadChunk(str_chunk, current_anim->data);
 				}
 			}
 		} else if (status == PAUSED) {
@@ -134,6 +145,7 @@ void Display::reset()
 	for (uint8_t i = 0; i < 8; i++)
 		disp_buf[i] = 0xff;
 	str_pos = 0;
+	str_chunk = 0;
 	char_pos = -1;
 	need_update = 1;
 	status = RUNNING;

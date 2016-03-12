@@ -27,7 +27,7 @@ System rocket;
 
 animation_t active_anim;
 
-uint8_t disp_buf[260]; // 4 byte header + 256 byte data
+uint8_t disp_buf[132]; // 4 byte header + 128 byte data
 uint8_t *rx_buf = disp_buf + sizeof(disp_buf) - 33;
 
 void System::initialize()
@@ -78,7 +78,8 @@ void System::loadPattern_P(const uint8_t *pattern_ptr)
 void System::loadPattern_buf(uint8_t *pattern)
 {
 	active_anim.type = (AnimationType)(pattern[0] >> 4);
-	active_anim.length = pattern[1];
+	active_anim.length = (pattern[0] & 0x0f) << 8;
+	active_anim.length += pattern[1];
 
 	if (active_anim.type == AnimationType::TEXT) {
 		active_anim.speed = (pattern[2] & 0xf0) + 15;

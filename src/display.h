@@ -34,7 +34,7 @@ struct animation {
 	/**
 	 * Length of data in bytes
 	 */
-	uint8_t length;
+	uint16_t length;
 
 	/**
 	 * * If type == AnimationType::TEXT: Text scroll speed in columns per TODO
@@ -75,6 +75,7 @@ class Display {
 		uint8_t active_col;
 		uint8_t disp_buf[8];
 		uint8_t str_pos;
+		uint8_t str_chunk;
 		int8_t char_pos;
 
 		enum AnimationStatus : uint8_t {

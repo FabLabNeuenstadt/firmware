@@ -80,7 +80,7 @@ class Storage {
 		 *
 		 * @param idx pattern index (starting with 0)
 		 * @param data pointer to data structure for the pattern. Must be
-		 *        at least 260 bytes
+		 *        at least 132 bytes
 		 */
 		void load(uint8_t idx, uint8_t *data);
 

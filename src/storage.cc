@@ -268,13 +268,8 @@ void Storage::load(uint8_t idx, uint8_t *data)
 	header[0] = data[0];
 	header[1] = data[1];
 
-	if (header[0] & 0x0f) {
-		// read whole byte block
-		i2c_read(1 + (page_offset / 8), (page_offset % 8) * 32 + 4, 128, data + 4);
-		i2c_read(1 + (page_offset / 8), (page_offset % 8) * 32 + 4 + 128, 128, data + 4 + 128);
-	} else {
-		i2c_read(1 + (page_offset / 8), (page_offset % 8) * 32 + 4, header[1], data + 4);
-	}
+	// always read 128 bytes - the system will ignore trailing bytes
+	i2c_read(1 + (page_offset / 8), (page_offset % 8) * 32 + 4, 128, data + 4);
 }
 
 void Storage::loadChunk(uint8_t chunk, uint8_t *data)
