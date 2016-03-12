@@ -13,6 +13,10 @@
 
 #include <avr/pgmspace.h>
 
+/*
+ * Note: Static patterns must not be longer than 128 bytes (headers excluded)
+ */
+
 const uint8_t PROGMEM shutdownPattern[] = {
 	0x20, 0x40,
 	0x01, 0x0f,

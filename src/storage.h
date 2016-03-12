@@ -15,6 +15,8 @@
 class Storage {
 	private:
 		uint8_t num_anims;
+		uint8_t page_offset;
+		uint8_t header[2];
 		uint8_t first_free_page;
 		uint8_t i2c_start_write(void);
 		uint8_t i2c_start_read(void);
@@ -81,6 +83,15 @@ class Storage {
 		 *        at least 260 bytes
 		 */
 		void load(uint8_t idx, uint8_t *data);
+
+		/**
+		 * Load partial pattern chunk (without header) from EEPROM.
+		 *
+		 * @param chunk 128 byte-offset inside pattern (starting with 0)
+		 * @param data pointer to data structure for the pattern. Must be
+		 *        at least 128 bytes
+		 */
+		void loadChunk(uint8_t chunk, uint8_t *data);
 
 		/**
 		 * Save (possibly partial) pattern on the EEPROM. 32 bytes of

@@ -260,12 +260,27 @@ bool Storage::hasData()
 
 void Storage::load(uint8_t idx, uint8_t *data)
 {
-	uint8_t page_offset;
-	uint8_t header[2];
 	i2c_read(0, 1 + idx, 1, &page_offset);
 
-	i2c_read(1 + (page_offset / 8), (page_offset % 8) * 32,  2, header);
-	i2c_read(1 + (page_offset / 8), (page_offset % 8) * 32, header[1] + 4, data);
+	// always read headers
+	i2c_read(1 + (page_offset / 8), (page_offset % 8) * 32,  4, data);
+
+	header[0] = data[0];
+	header[1] = data[1];
+
+	if (header[0] & 0x0f) {
+		// read whole byte block
+		i2c_read(1 + (page_offset / 8), (page_offset % 8) * 32 + 4, 128, data + 4);
+		i2c_read(1 + (page_offset / 8), (page_offset % 8) * 32 + 4 + 128, 128, data + 4 + 128);
+	} else {
+		i2c_read(1 + (page_offset / 8), (page_offset % 8) * 32 + 4, header[1], data + 4);
+	}
+}
+
+void Storage::loadChunk(uint8_t chunk, uint8_t *data)
+{
+	uint8_t this_page_offset = page_offset + (4 * chunk);
+	i2c_read(1 + (this_page_offset / 8), (this_page_offset % 8) * 32 + 4, 128, data);
 }
 
 void Storage::save(uint8_t *data)
