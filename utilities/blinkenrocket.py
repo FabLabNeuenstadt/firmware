@@ -224,7 +224,7 @@ if __name__ == '__main__':
 	b = blinkenrocket()
 
 	for message in sys.argv[2:]:
-		b.addFrame(textFrame(message, speed=1))
+		b.addFrame(textFrame(message, speed=2))
 	b.addFrame(textFrame(" \x04 "))
 	b.addFrame(animationFrame(map(lambda x : chr(x), [0, 0, 0, 0, 0, 0, 0, 0, 255, 255, 255, 255, 255, 255, 255, 255])))
 	#for i in xrange(10):
