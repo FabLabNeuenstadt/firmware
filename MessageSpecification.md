@@ -25,7 +25,7 @@ TYPE    LENGTH
 ```
 
 Thus the data length can be up to 4kByte of data (4096 byte). A type of `0001` denotes a `TEXT` type pattern, a type `0010` denotes an `ANIMATION` type pattern.
-The modem only receives data for this pattern until length is exceeded. E.g. when a *`HEADER`* with the contents `00011111 11111111` is received by the modem it will read 4098 byte for the current pattern (2 byte header, 4096 byte of data).  
+The modem only receives data for this pattern until length is exceeded. E.g. when a *`HEADER`* with the contents `00011111 11111111` is received by the modem it will read 4098 byte for the current pattern (2 byte header, 4096 byte of data).  The maximum length for texts is 4096 characters and 512 frames for animation.
 
 ##### TEXT METADATA 
 
