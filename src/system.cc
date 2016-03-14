@@ -309,17 +309,24 @@ void System::shutdown()
 	// Don't disable PCICR, something else might need it.
 	PCMSK1 &= ~(_BV(PCINT15) | _BV(PCINT11));
 
-	// debounce
-	_delay_ms(50);
-
 	// turn on display
 	loadPattern(current_anim_no);
 	display.enable();
 
-	// ... and modem
+	// wait for wakeup button(s) to be released
+	while (!((PINC & _BV(PC3)) && (PINC & _BV(PC7))))
+		display.update();
+
+	// debounce
+	for (i = 0; i < 50; i++) {
+		display.update();
+		_delay_ms(2);
+	}
+
+	// finally, turn on the modem...
 	modem.enable();
 
-	// also, reset state machine
+	// ... and reset the receive state machine
 	rxExpect = START1;
 }
 
