@@ -82,16 +82,16 @@ void Display::update() {
 					}
 				}
 
-				if (current_anim->direction == 0)
-					glyph_addr = (uint8_t *)pgm_read_ptr(&font[current_anim->data[str_pos]]);
-				else
-					glyph_addr = (uint8_t *)pgm_read_ptr(&font[current_anim->data[current_anim->length - 1 - str_pos]]); // XXX Broken by str_chunk changes, FIXME!
+				glyph_addr = (uint8_t *)pgm_read_ptr(&font[current_anim->data[str_pos]]);
 				glyph_len = pgm_read_byte(&glyph_addr[0]);
 				char_pos++;
 
 				if (char_pos > glyph_len) {
 					char_pos = 0;
-					str_pos++;
+					if (current_anim->direction == 0)
+						str_pos++;
+					else
+						str_pos--;
 				}
 
 				if (current_anim->direction == 0) {
@@ -114,26 +114,52 @@ void Display::update() {
 				}
 				str_pos += 8;
 			}
-			if ((current_anim->length >= 128) && (str_pos >= 128)) {
-				str_pos = 0;
-				str_chunk++;
-				storage.loadChunk(str_chunk, current_anim->data);
-			}
-			if ((str_chunk == (current_anim->length / 128))
-					&& (str_pos >= (current_anim->length % 128))) {
-				str_chunk = 0;
-				str_pos = 0;
-				if (current_anim->delay > 0) {
-					status = PAUSED;
-				}
-				if (current_anim->length >= 128) {
+			if (current_anim->direction == 0) {
+				if ((current_anim->length > 128) && (str_pos >= 128)) {
+					str_pos = 0;
+					str_chunk++;
 					storage.loadChunk(str_chunk, current_anim->data);
+				}
+				if ((str_chunk == ((current_anim->length - 1) / 128))
+						&& (str_pos > ((current_anim->length - 1) % 128))) {
+					str_chunk = 0;
+					str_pos = 0;
+					if (current_anim->delay > 0) {
+						status = PAUSED;
+					}
+					if (current_anim->length > 128) {
+						storage.loadChunk(str_chunk, current_anim->data);
+					}
+				}
+			} else {
+				if (str_pos >= 128) {
+					if (str_chunk == 0) {
+						if (current_anim->length > 128) {
+							str_chunk = (current_anim->length - 1) / 128;
+							storage.loadChunk(str_chunk, current_anim->data);
+						}
+						if (current_anim->delay > 0) {
+							str_pos = 0;
+							status = PAUSED;
+						} else {
+							str_pos = (current_anim->length - 1) % 128;
+						}
+					} else {
+						str_chunk--;
+						storage.loadChunk(str_chunk, current_anim->data);
+						str_pos = 127;
+					}
 				}
 			}
 		} else if (status == PAUSED) {
 			str_pos++;
 			if (str_pos >= current_anim->delay) {
-				str_pos = 0;
+				if (current_anim->direction == 0)
+					str_pos = 0;
+				else if (current_anim->length <= 128)
+					str_pos = current_anim->length - 1;
+				else
+					str_pos = 127;
 				status = RUNNING;
 			}
 		}
@@ -155,6 +181,13 @@ void Display::show(animation_t *anim)
 {
 	current_anim = anim;
 	reset();
+	if (current_anim->direction == 1) {
+		if (current_anim->length > 128) {
+			str_chunk = (current_anim->length - 1) / 128;
+			storage.loadChunk(str_chunk, current_anim->data);
+		}
+		str_pos = (current_anim->length - 1) % 128;
+	}
 }
 
 /*

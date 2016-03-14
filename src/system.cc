@@ -88,6 +88,7 @@ void System::loadPattern_buf(uint8_t *pattern)
 	} else if (active_anim.type == AnimationType::FRAMES) {
 		active_anim.speed = ((pattern[2] & 0x0f) << 4) + 15;
 		active_anim.delay = (pattern[3] & 0x0f) << 2;
+		active_anim.direction = 0;
 	}
 
 	active_anim.data = pattern + 4;

@@ -48,7 +48,7 @@ struct animation {
 	uint8_t delay;
 
 	/**
-	 * Scroll mode / direction. Not yet supported.
+	 * Scroll mode / direction. Must be set to 0 if type != TEXT.
 	 */
 	uint8_t direction;
 
