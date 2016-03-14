@@ -6,7 +6,6 @@ Use `make && sudo make program` to flash a blinkenrocket and
 
 ## Known Bugs / TODOs
 
-* Patterns longer than 252 bytes (excluding headers) are not yet supported
 * Pattern transfers which are longer than ~16kbit don't work reliably and
   may leave the device in a bogus state (requiring a power on reset before
   new patterns can be transferred)
