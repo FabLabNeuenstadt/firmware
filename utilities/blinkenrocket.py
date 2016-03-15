@@ -85,9 +85,9 @@ class modem:
 				tmpdata.append(chr(self.hammingCalculateParity2416(ord(self.data[index]),ord(self.data[index+1]))))
 			self.data = tmpdata
 		# generate the audio itself
-		# add 420ms of sync signal in front
+		# add 1000ms of sync signal before the data
 		# (some sound cards take a while to produce a proper output signal)
-		sound = self.generateSyncSignal(1200)
+		sound = self.generateSyncSignal(3000)
 		# process the data and insert sync signal every 10 bytes
 		for byte in self.data:
 			sound += self.modemcode(ord(byte))
