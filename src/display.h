@@ -81,12 +81,64 @@ typedef struct animation animation_t;
  */
 class Display {
 	private:
+
+		/**
+		 * The currently active animation
+		 */
 		animation_t *current_anim;
+
+		/**
+		 * Set to a true value by multiplex() if an update (that is,
+		 * a scroll step or a new frame) is needed. Checked and reset to
+		 * false by update().
+		 */
 		uint8_t need_update;
+
+		/**
+		 * The currently active column in multiplex()
+		 */
 		uint8_t active_col;
+
+		/**
+		 * The current display content which multiplex() will show
+		 */
 		uint8_t disp_buf[8];
+
+		/**
+		 * The current position inside current_anim->data. For a TEXT
+		 * animation, this indicates the currently active character.
+		 * In case of FRAMES, it indicates the leftmost column of an
+		 * eight-column frame.
+		 *
+		 * This variable is also used as delay counter for status == PAUSED,
+		 * so it must be re-initialized when the pause is over.
+		 */
 		uint8_t str_pos;
+
+		/**
+		 * The currently active animation chunk. For an animation which is
+		 * not longer than 128 bytes, this will always read 0. Otherwise,
+		 * it indicates the offset in 128 byte-chunks from the start of the
+		 * animation which is currently held in memory. So, str_chunk == 1
+		 * means current->anim_data contains animation bytes 129 to 256,
+		 * and so on. The current position in the complete animation is
+		 * str_chunk * 128 + str_pos.
+		 */
 		uint8_t str_chunk;
+
+		/**
+		 * If current_anim->type == TEXT: The column of the character
+		 * pointed to by str_pos which was last added to the display.
+		 *
+		 * For current_anim->direction == 0, this refers to the character's
+		 * left border and counts from 0 onwards. so char_pos == 0 means the
+		 * leftmost column of the character was last added to the display.
+		 *
+		 * For current_anim->direction == 1, this refers to the character's
+		 * right border and also counts from 0 onwards, so char_pos == 0
+		 * means the rightmost column of the character was last added to the
+		 * display.
+		 */
 		int8_t char_pos;
 
 		enum AnimationStatus : uint8_t {
@@ -95,6 +147,11 @@ class Display {
 			PAUSED
 		};
 
+		/**
+		 * The current animation status: RUNNING (text/frames are being
+		 * displayed) or PAUSED (the display isn't changed until the
+		 * delay specified by current_anim->delay has passed)
+		 */
 		AnimationStatus status;
 
 	public:
