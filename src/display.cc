@@ -55,7 +55,7 @@ void Display::multiplex()
 
 	if (++active_col == 8) {
 		active_col = 0;
-		if (++update_cnt == current_anim->speed) {
+		if (++update_cnt == update_threshold) {
 			update_cnt = 0;
 			need_update = 1;
 		}
@@ -124,6 +124,7 @@ void Display::update() {
 					str_pos = 0;
 					if (current_anim->delay > 0) {
 						status = PAUSED;
+						update_threshold = 244;
 					}
 					if (current_anim->length > 128) {
 						storage.loadChunk(str_chunk, current_anim->data);
@@ -139,6 +140,7 @@ void Display::update() {
 						if (current_anim->delay > 0) {
 							str_pos = 0;
 							status = PAUSED;
+							update_threshold = 244;
 						} else {
 							str_pos = (current_anim->length - 1) % 128;
 						}
@@ -159,6 +161,7 @@ void Display::update() {
 				else
 					str_pos = 127;
 				status = RUNNING;
+				update_threshold = current_anim->speed;
 			}
 		}
 	}
@@ -180,6 +183,7 @@ void Display::show(animation_t *anim)
 {
 	current_anim = anim;
 	reset();
+	update_threshold = current_anim->speed;
 	if (current_anim->direction == 1) {
 		if (current_anim->length > 128) {
 			str_chunk = (current_anim->length - 1) / 128;

@@ -102,6 +102,12 @@ class Display {
 		uint8_t need_update;
 
 		/**
+		 * Number of frames after which update() is called. This value
+		 * holds either the current animation's speed or its delay.
+		 */
+		uint8_t update_threshold;
+
+		/**
 		 * The currently active column in multiplex()
 		 */
 		uint8_t active_col;

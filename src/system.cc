@@ -83,11 +83,11 @@ void System::loadPattern_buf(uint8_t *pattern)
 
 	if (active_anim.type == AnimationType::TEXT) {
 		active_anim.speed = 250 - (pattern[2] & 0xf0);
-		active_anim.delay = (pattern[2] & 0x0f ) << 4;
+		active_anim.delay = (pattern[2] & 0x0f );
 		active_anim.direction = pattern[3] >> 4;
 	} else if (active_anim.type == AnimationType::FRAMES) {
 		active_anim.speed = 250 - ((pattern[2] & 0x0f) << 4);
-		active_anim.delay = (pattern[3] & 0x0f) << 2;
+		active_anim.delay = (pattern[3] & 0x0f);
 		active_anim.direction = 0;
 	}
 
@@ -288,9 +288,9 @@ void System::shutdown()
 		display.update();
 
 	// and some more to debounce the buttons (and finish powerdown animation)
-	for (i = 0; i < 100; i++) {
+	for (i = 0; i < 200; i++) {
 		display.update();
-		_delay_ms(2);
+		_delay_ms(1);
 	}
 
 	// turn off display to indicate we're about to shut down
@@ -319,9 +319,9 @@ void System::shutdown()
 		display.update();
 
 	// debounce
-	for (i = 0; i < 50; i++) {
+	for (i = 0; i < 100; i++) {
 		display.update();
-		_delay_ms(2);
+		_delay_ms(1);
 	}
 
 	// finally, turn on the modem...

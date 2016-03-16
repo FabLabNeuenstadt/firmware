@@ -41,6 +41,31 @@ XXXX XXXX XXXX XXXX (MSB -> LSB)
 
 The speed and delay ranges from a numeric value from 0 (0000) to 15 (1111). The higher the number, the faster the speed and the longer the delay. A direction of 0 (0000) specifies a left direction, a direction of 1 (0001) specifies a right direction.
 
+The scroll rate is about 1 / (0.5 - (0.032 * speed)) columns per second (or,
+precisely, 1 / (0.002048 * (250 - (16 * speed))) columns per second). This
+means that it can range from about 2 columns per second (speed=0) to almost 49
+columns per second (speed=15). Note that it is not a linear function -- see the
+following speed <-> columns per second translation list for details:
+
+* speed =  0 :  1.95 cps
+* speed =  1 :  2.09 cps
+* speed =  2 :  2.24 cps
+* speed =  3 :  2.42 cps
+* speed =  4 :  2.63 cps
+* speed =  5 :  2.87 cps
+* speed =  6 :  3.17 cps
+* speed =  7 :  3.54 cps
+* speed =  8 :  4.00 cps
+* speed =  9 :  4.61 cps
+* speed = 10 :  5.43 cps
+* speed = 11 :  6.60 cps
+* speed = 12 :  8.42 cps
+* speed = 13 : 11.6  cps
+* speed = 14 : 18.8  cps
+* speed = 15 : 48.8  cps
+
+The delay takes 0.5 * delay seconds.
+
 ##### ANIMATION METADATA
 
 A *`ANIMMETA`* is a two byte (16 bit) length metadata field for animation type pattern. It encodes the frame rate in the lower nibble of the first byte and the delay in the lower nibble of the second byte.
@@ -51,7 +76,10 @@ A *`ANIMMETA`* is a two byte (16 bit) length metadata field for animation type p
  SPEED     DELAY
 ```
 
-The speed and delay ranges from a numeric value from 0 (0000) to 15 (1111).
+The speed and delay ranges from a numeric value from 0 (0000) to 15 (1111)
+and are calculated as described in TEXT METADATA (except that the speed
+now refers to frames per second).
+
 ## Message format
 
 The message transmitted has to follow the following diagram:
