@@ -122,7 +122,7 @@ class textFrame(Frame):
 	# identifier as of message specification: 0001
 	identifier = 0x01
 
-	def __init__(self,text,speed=1,delay=0,direction=0):
+	def __init__(self,text,speed=13,delay=0,direction=0):
 		self.text = text
 		self.setSpeed(speed)
 		self.setDelay(delay)
@@ -159,7 +159,7 @@ class animationFrame(Frame):
 	# identifier as per specification: 0010	
 	identifier = 0x02
 
-	def __init__(self,animation,speed=1,delay=0):
+	def __init__(self,animation,speed=13,delay=0):
 		self.setAnimation(animation)
 		self.setSpeed(speed)
 		self.setDelay(delay)

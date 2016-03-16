@@ -82,11 +82,11 @@ void System::loadPattern_buf(uint8_t *pattern)
 	active_anim.length += pattern[1];
 
 	if (active_anim.type == AnimationType::TEXT) {
-		active_anim.speed = (pattern[2] & 0xf0) + 15;
+		active_anim.speed = 250 - (pattern[2] & 0xf0);
 		active_anim.delay = (pattern[2] & 0x0f ) << 4;
 		active_anim.direction = pattern[3] >> 4;
 	} else if (active_anim.type == AnimationType::FRAMES) {
-		active_anim.speed = ((pattern[2] & 0x0f) << 4) + 15;
+		active_anim.speed = 250 - ((pattern[2] & 0x0f) << 4);
 		active_anim.delay = (pattern[3] & 0x0f) << 2;
 		active_anim.direction = 0;
 	}
