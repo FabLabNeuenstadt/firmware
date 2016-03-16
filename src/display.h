@@ -88,6 +88,13 @@ class Display {
 		animation_t *current_anim;
 
 		/**
+		 * Internal display update counter. Incremented by multiplex().
+		 * update() is called (and the counter reset) whenever
+		 * update_cnt == need_update.
+		 */
+		uint8_t update_cnt;
+
+		/**
 		 * Set to a true value by multiplex() if an update (that is,
 		 * a scroll step or a new frame) is needed. Checked and reset to
 		 * false by update().

@@ -45,8 +45,6 @@ void Display::enable()
 
 void Display::multiplex()
 {
-	static uint8_t scroll;
-
 	/*
 	 * To avoid flickering, do not put any code (or expensive index
 	 * calculations) between the following three lines.
@@ -57,8 +55,8 @@ void Display::multiplex()
 
 	if (++active_col == 8) {
 		active_col = 0;
-		if (++scroll == current_anim->speed) {
-			scroll = 0;
+		if (++update_cnt == current_anim->speed) {
+			update_cnt = 0;
 			need_update = 1;
 		}
 	}
@@ -170,6 +168,7 @@ void Display::reset()
 {
 	for (uint8_t i = 0; i < 8; i++)
 		disp_buf[i] = 0xff;
+	update_cnt = 0;
 	str_pos = 0;
 	str_chunk = 0;
 	char_pos = -1;
