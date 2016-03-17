@@ -113,11 +113,6 @@ void Display::update() {
 				str_pos += 8;
 			}
 			if (current_anim->direction == 0) {
-				if ((current_anim->length > 128) && (str_pos >= 128)) {
-					str_pos = 0;
-					str_chunk++;
-					storage.loadChunk(str_chunk, current_anim->data);
-				}
 				if ((str_chunk == ((current_anim->length - 1) / 128))
 						&& (str_pos > ((current_anim->length - 1) % 128))) {
 					str_chunk = 0;
@@ -129,6 +124,10 @@ void Display::update() {
 					if (current_anim->length > 128) {
 						storage.loadChunk(str_chunk, current_anim->data);
 					}
+				} else if ((current_anim->length > 128) && (str_pos >= 128)) {
+					str_pos = 0;
+					str_chunk++;
+					storage.loadChunk(str_chunk, current_anim->data);
 				}
 			} else {
 				if (str_pos >= 128) {
@@ -194,12 +193,9 @@ void Display::show(animation_t *anim)
 }
 
 /*
- * Draws a single display column. This function should be called at least once
- * per millisecond.
- *
  * Current configuration:
- * Called every 256 microseconds. The whole display is refreshed every 2048us,
- * giving a refresh rate of ~500Hz
+ * One interrupt per 256 microseconds. The whole display is refreshed every
+ * 2048us, giving a refresh rate of ~500Hz
  */
 ISR(TIMER0_OVF_vect)
 {
