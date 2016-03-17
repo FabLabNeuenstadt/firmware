@@ -105,7 +105,6 @@ void System::loadPattern(uint8_t anim_no)
 	}
 }
 
-// ! This function has not been tested yet
 void System::receive(void)
 {
 	static uint8_t rx_pos = 0;
@@ -223,21 +222,18 @@ void System::receive(void)
 
 void System::loop()
 {
-	// both buttons are pressed
+	// First, check for a shutdown request (long press on both buttons)
 	if ((PINC & (_BV(PC3) | _BV(PC7))) == 0) {
-		// naptime!
-		// But not before both buttons have been pressed for
-		// SHUTDOWN_THRESHOLD * 0.256 ms. And then, not before both have
-		// been released, because otherwise we'd go te sleep when
-		// they're pressed and wake up when they're released, which
-		// isn't really the point here.
-
+		/*
+		 * Naptime!
+		 * (But not before both buttons have been pressed for at least
+		 * SHUTDOWN_THRESHOLD * 0.256 ms)
+		 */
 		if (want_shutdown < SHUTDOWN_THRESHOLD) {
 			want_shutdown++;
 		}
 		else {
 			shutdown();
-
 			want_shutdown = 0;
 		}
 	}
@@ -245,14 +241,18 @@ void System::loop()
 		want_shutdown = 0;
 	}
 
-	// TODO refactor the blocks above and below into one
-
 	if ((PINC & _BV(PC3)) == 0) {
 		btnMask = (ButtonMask)(btnMask | BUTTON_RIGHT);
 	}
 	if ((PINC & _BV(PC7)) == 0) {
 		btnMask = (ButtonMask)(btnMask | BUTTON_LEFT);
 	}
+
+	/*
+	 * Only handle button presses when they are released to avoid
+	 * double actions, such as switching to the next/previous pattern
+	 * when the user actually wants to press the shutdown combo.
+	 */
 	if ((PINC & (_BV(PC3) | _BV(PC7))) == (_BV(PC3) | _BV(PC7))) {
 		if (btnMask == BUTTON_RIGHT) {
 			current_anim_no = (current_anim_no + 1) % storage.numPatterns();
@@ -314,7 +314,10 @@ void System::shutdown()
 	loadPattern(current_anim_no);
 	display.enable();
 
-	// wait for wakeup button(s) to be released
+	/*
+	 * Wait for wakeup button(s) to be released to avoid accidentally
+	 * going back to sleep again or switching the active pattern.
+	 */
 	while (!((PINC & _BV(PC3)) && (PINC & _BV(PC7))))
 		display.update();
 
@@ -340,7 +343,7 @@ void System::handleTimeout()
 
 ISR(PCINT1_vect)
 {
-	// we use PCINT1 for wakeup, so we need an (in this case empty) ISR for it
+	// we use PCINT1 for wakeup, so we need an (empty) ISR for it
 }
 
 ISR(WDT_vect)
