@@ -14,7 +14,8 @@
 #include <avr/pgmspace.h>
 
 /*
- * Note: Static patterns must not be longer than 128 bytes (headers excluded)
+ * Note: Static patterns must not be longer than 128 bytes (headers excluded).
+ * See MessageSpecification.md for the meaning of their headers.
  */
 
 const uint8_t PROGMEM shutdownPattern[] = {
@@ -39,19 +40,19 @@ const uint8_t PROGMEM flashingPattern[] = {
 
 #ifdef LANG_DE
 const uint8_t PROGMEM emptyPattern[] = {
-	0x10, 0x2d,
+	0x10, 0x29,
 	0xc0, 0x00,
 	' ',   1, ' ', 'B', 'l', 'i', 'n', 'k', 'e', 'n', 'r', 'o', 'c', 'k', 'e',
-	't', ' ', 'v', '1', '.', '0', 'b', 'e', 't', 'a', ' ', '-', ' ', 'S', 'p',
-	'e', 'i', 'c', 'h', 'e', 'r', ' ', 'i', 's', 't', ' ', 'l', 'e', 'e', 'r'
+	't', ' ', 'v', '1', '.', '0', ' ', '-', ' ', 'S', 'p', 'e', 'i', 'c', 'h',
+	'e', 'r', ' ', 'i', 's', 't', ' ', 'l', 'e', 'e', 'r'
 };
 #else
 const uint8_t PROGMEM emptyPattern[] = {
-	0x10, 0x2c,
+	0x10, 0x28,
 	0xc0, 0x00,
 	' ',   1, ' ', 'B', 'l', 'i', 'n', 'k', 'e', 'n', 'r', 'o', 'c', 'k', 'e',
-	't', ' ', 'v', '1', '.', '0', 'b', 'e', 't', 'a', ' ', '-', ' ', 'S', 't',
-	'o', 'r', 'a', 'g', 'e', ' ', 'i', 's', ' ', 'e', 'm', 'p', 't', 'y'
+	't', ' ', 'v', '1', '.', '0', ' ', '-', ' ', 'S', 't', 'o', 'r', 'a', 'g',
+	'e', ' ', 'i', 's', ' ', 'e', 'm', 'p', 't', 'y'
 };
 #endif
 
