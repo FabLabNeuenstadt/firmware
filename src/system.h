@@ -19,6 +19,7 @@
 class System {
 	private:
 		uint16_t want_shutdown;
+		uint8_t btn_debounce;
 		uint8_t current_anim_no;
 		void shutdown(void);
 		void receive(void);
@@ -57,7 +58,7 @@ class System {
 		ButtonMask btnMask;
 
 	public:
-		System() { want_shutdown = 0; rxExpect = START1; current_anim_no = 0; btnMask = BUTTON_NONE;};
+		System() { want_shutdown = 0; rxExpect = START1; current_anim_no = 0; btnMask = BUTTON_NONE; btn_debounce = 0;};
 
 		/**
 		 * Initial MCU setup. Turns off unused peripherals to save power

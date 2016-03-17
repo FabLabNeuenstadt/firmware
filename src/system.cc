@@ -241,30 +241,37 @@ void System::loop()
 		want_shutdown = 0;
 	}
 
-	if ((PINC & _BV(PC3)) == 0) {
-		btnMask = (ButtonMask)(btnMask | BUTTON_RIGHT);
-	}
-	if ((PINC & _BV(PC7)) == 0) {
-		btnMask = (ButtonMask)(btnMask | BUTTON_LEFT);
-	}
-
-	/*
-	 * Only handle button presses when they are released to avoid
-	 * double actions, such as switching to the next/previous pattern
-	 * when the user actually wants to press the shutdown combo.
-	 */
-	if ((PINC & (_BV(PC3) | _BV(PC7))) == (_BV(PC3) | _BV(PC7))) {
-		if (btnMask == BUTTON_RIGHT) {
-			current_anim_no = (current_anim_no + 1) % storage.numPatterns();
-			loadPattern(current_anim_no);
-		} else if (btnMask == BUTTON_LEFT) {
-			if (current_anim_no == 0)
-				current_anim_no = storage.numPatterns() - 1;
-			else
-				current_anim_no--;
-			loadPattern(current_anim_no);
+	if (btn_debounce == 0) {
+		if ((PINC & _BV(PC3)) == 0) {
+			btnMask = (ButtonMask)(btnMask | BUTTON_RIGHT);
 		}
-		btnMask = BUTTON_NONE;
+		if ((PINC & _BV(PC7)) == 0) {
+			btnMask = (ButtonMask)(btnMask | BUTTON_LEFT);
+		}
+		/*
+		* Only handle button presses when they are released to avoid
+		* double actions, such as switching to the next/previous pattern
+		* when the user actually wants to press the shutdown combo.
+		*/
+		if ((PINC & (_BV(PC3) | _BV(PC7))) == (_BV(PC3) | _BV(PC7))) {
+			if (btnMask == BUTTON_RIGHT) {
+				current_anim_no = (current_anim_no + 1) % storage.numPatterns();
+				loadPattern(current_anim_no);
+			} else if (btnMask == BUTTON_LEFT) {
+				if (current_anim_no == 0)
+					current_anim_no = storage.numPatterns() - 1;
+				else
+					current_anim_no--;
+				loadPattern(current_anim_no);
+			}
+			btnMask = BUTTON_NONE;
+			/*
+			 * Ignore keypresses for 25ms to work around bouncing buttons
+			 */
+			btn_debounce = 100;
+		}
+	} else {
+		btn_debounce--;
 	}
 
 	while (modem.buffer_available()) {
