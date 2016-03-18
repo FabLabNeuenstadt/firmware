@@ -215,6 +215,7 @@ void System::receive(void)
 			} else if (rx_pos == 32) {
 				rx_pos = 0;
 				storage.append(rx_buf);
+				wdt_reset();
 			}
 			break;
 	}
