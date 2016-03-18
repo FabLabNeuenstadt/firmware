@@ -77,6 +77,13 @@ class System {
 		 */
 		void loop(void);
 
+		/**
+		 * Resets the modem receive state machine and loads the
+		 * "Transmission error" message. Called by the Watchdog Timeout
+		 * ISR when a transmission was started (2x START received) but not
+		 * properly finished (that is, four seconds passed since the last
+		 * received byte and END byte was receveid).
+		 */
 		void handleTimeout(void);
 };
 
