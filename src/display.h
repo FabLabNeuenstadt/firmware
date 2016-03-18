@@ -199,8 +199,10 @@ class Display {
 		/**
 		 * Update display content.
 		 * Checks current_anim->speed and current_anim->type and scrolls
-		 * the text / advances a frame when appropriate. Does nothing
-		 * otherwise.
+		 * the text / advances a frame when appropriate. Also uses
+		 * Storage::loadChunk() to load the next 128 pattern bytes if
+		 * current_anim->length is greater than 128 and the end of the
+		 * 128 byte pattern buffer is reached.
 		 */
 		void update(void);
 

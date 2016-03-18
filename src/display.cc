@@ -70,6 +70,10 @@ void Display::update() {
 
 		if (status == RUNNING) {
 			if (current_anim->type == AnimationType::TEXT) {
+
+				/*
+				 * Scroll display contents to the left/right
+				 */
 				if (current_anim->direction == 0) {
 					for (i = 0; i < 7; i++) {
 						disp_buf[i] = disp_buf[i+1];
@@ -80,6 +84,9 @@ void Display::update() {
 					}
 				}
 
+				/*
+				 * Load current character
+				 */
 				glyph_addr = (uint8_t *)pgm_read_ptr(&font[current_anim->data[str_pos]]);
 				glyph_len = pgm_read_byte(&glyph_addr[0]);
 				char_pos++;
@@ -89,9 +96,13 @@ void Display::update() {
 					if (current_anim->direction == 0)
 						str_pos++;
 					else
-						str_pos--;
+						str_pos--; // may underflow, but that's okay
 				}
 
+				/*
+				 * Append one character column (or whitespace if we are
+				 * between two characters)
+				 */
 				if (current_anim->direction == 0) {
 					if (char_pos == 0) {
 						disp_buf[7] = 0xff; // whitespace
@@ -112,7 +123,13 @@ void Display::update() {
 				}
 				str_pos += 8;
 			}
+
 			if (current_anim->direction == 0) {
+				/*
+				 * Check whether we reached the end of the pattern
+				 * (that is, we're in the last chunk and reached the
+				 * remaining pattern length)
+				 */
 				if ((str_chunk == ((current_anim->length - 1) / 128))
 						&& (str_pos > ((current_anim->length - 1) % 128))) {
 					str_chunk = 0;
@@ -124,13 +141,26 @@ void Display::update() {
 					if (current_anim->length > 128) {
 						storage.loadChunk(str_chunk, current_anim->data);
 					}
+				/*
+				 * Otherwise, check whether the pattern is split into
+				 * several chunks and we reached the end of the chunk
+				 * kept in current_anim->data
+				 */
 				} else if ((current_anim->length > 128) && (str_pos >= 128)) {
 					str_pos = 0;
 					str_chunk++;
 					storage.loadChunk(str_chunk, current_anim->data);
 				}
 			} else {
+				/*
+				 * In this branch we keep doing str_pos--, so check for
+				 * underflow
+				 */
 				if (str_pos >= 128) {
+					/*
+					 * Check whether we reached the end of the pattern
+					 * (and whether we need to load a new chunk)
+					 */
 					if (str_chunk == 0) {
 						if (current_anim->length > 128) {
 							str_chunk = (current_anim->length - 1) / 128;
@@ -143,6 +173,9 @@ void Display::update() {
 						} else {
 							str_pos = (current_anim->length - 1) % 128;
 						}
+					/*
+					 * Otherwise, we reached the end of the active chunk
+					 */
 					} else {
 						str_chunk--;
 						storage.loadChunk(str_chunk, current_anim->data);
