@@ -191,7 +191,7 @@ void Display::update() {
 				else if (current_anim->length <= 128)
 					str_pos = current_anim->length - 1;
 				else
-					str_pos = 127;
+					str_pos = (current_anim->length - 1) % 128;
 				status = RUNNING;
 				update_threshold = current_anim->speed;
 			}
