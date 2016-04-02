@@ -7,9 +7,9 @@ python blinkenrocket.py $OUT "$*"
 
 case "$(uname -s)" in
 Darwin)
-   	play $OUT
-   	;;
-*) 
+    play $OUT
+    ;;
+Linux)
     aplay $OUT
     ;;
 esac
