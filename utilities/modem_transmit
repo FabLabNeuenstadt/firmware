@@ -3,7 +3,7 @@
 OUT="$(mktemp)"
 trap "rm -f '$OUT'" EXIT INT QUIT TERM
 
-python blinkenrocket.py $OUT "$@"
+python blinkenrocket.py $OUT "$*"
 
 case "$(uname -s)" in
 Darwin)
